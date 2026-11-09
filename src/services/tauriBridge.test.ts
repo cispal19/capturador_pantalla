@@ -76,4 +76,16 @@ describe("TauriBridgeService", () => {
     const count = await tauriBridge.syncAnnotations([{ type: "rectangle", id: "1" }]);
     expect(count).toBe(1);
   });
+
+  it("copies captured screenshot to OS clipboard", async () => {
+    const success = await tauriBridge.copyCaptureToClipboard(10, 10, new Uint8ClampedArray(400));
+    expect(success).toBe(true);
+  });
+
+  it("saves captured screenshot to local file", async () => {
+    const res = await tauriBridge.saveCaptureToFile(10, 10, new Uint8ClampedArray(400), "png");
+    expect(res.format).toBe("png");
+    expect(res.filePath).toBeDefined();
+    expect(res.fileSizeBytes).toBe(400);
+  });
 });

@@ -94,6 +94,21 @@ Una vez delimitada la selección, se despliega una barra de herramientas flotant
 
 ---
 
+## 📋 Exportación Rápida: Portapapeles y Disco Local
+
+Una vez finalizada la selección y anotación de la captura:
+- **Copiado Inmediato al Portapapeles (`Enter` o botón "Copiar")**:
+  - Transfiere la composición final en memoria al portapapeles del sistema operativo (`arboard`) en formato nativo `image/png`.
+  - Cero archivos temporales residuales en disco para máxima seguridad corporativa.
+  - Cierra automáticamente la sesión de captura liberando recursos de memoria.
+- **Guardado en Almacenamiento Local (`Cmd+S` / `Ctrl+S` o botón "Guardar")**:
+  - Almacena el archivo codificado (PNG sin pérdidas o JPEG) directamente en la carpeta de imágenes o directorio configurado.
+  - Nomenclatura automática y reproducible con marca temporal: `Captura_YYYY-MM-DD_HH-mm-ss.[ext]`.
+- **Notificaciones Sutiles de Confirmación**:
+  - Toast visual no bloqueante (`pointer-events: none`) con desvanecimiento suave que confirma el estado de la operación (éxito o error).
+
+---
+
 ### Pruebas Automatizadas (TDD)
 ```bash
 # Ejecutar pruebas unitarias de frontend

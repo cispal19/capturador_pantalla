@@ -16,6 +16,7 @@ import {
 } from "../domain/geometry";
 import { UndoRedoStack, createAnnotation } from "../domain/annotations";
 import { AnnotationToolbar } from "./AnnotationToolbar";
+import { showToast } from "./Toast";
 import { tauriBridge } from "../services/tauriBridge";
 
 export class SelectionOverlay {
@@ -61,6 +62,8 @@ export class SelectionOverlay {
     this.toolbar.setOnUndo(() => this.undo());
     this.toolbar.setOnRedo(() => this.redo());
     this.toolbar.setOnToolChange(() => this.updateCursor());
+    this.toolbar.setOnCopy(() => void this.exportToClipboard());
+    this.toolbar.setOnSave(() => void this.exportToFile());
   }
 
   mount(container: HTMLElement = document.body) {
@@ -135,6 +138,46 @@ export class SelectionOverlay {
     this.history.redo();
     this.requestRender();
     void tauriBridge.syncAnnotations(this.history.getItems());
+  }
+
+  async exportToClipboard(): Promise<boolean> {
+    if (!this.activeBox || !this.ctx) return false;
+
+    const { x, y, width, height } = this.activeBox;
+    const w = Math.round(width);
+    const h = Math.round(height);
+    if (w < 10 || h < 10) return false;
+
+    try {
+      const imageData = this.ctx.getImageData(Math.round(x), Math.round(y), w, h);
+      await tauriBridge.copyCaptureToClipboard(w, h, imageData.data);
+      showToast("📋 Captura copiada al portapapeles");
+      this.cancel();
+      return true;
+    } catch {
+      showToast("⚠️ Error al copiar al portapapeles");
+      return false;
+    }
+  }
+
+  async exportToFile(format = "png"): Promise<boolean> {
+    if (!this.activeBox || !this.ctx) return false;
+
+    const { x, y, width, height } = this.activeBox;
+    const w = Math.round(width);
+    const h = Math.round(height);
+    if (w < 10 || h < 10) return false;
+
+    try {
+      const imageData = this.ctx.getImageData(Math.round(x), Math.round(y), w, h);
+      const res = await tauriBridge.saveCaptureToFile(w, h, imageData.data, format);
+      showToast(`💾 Captura guardada en ${res.filePath}`);
+      this.cancel();
+      return true;
+    } catch {
+      showToast("⚠️ Error al guardar captura en disco");
+      return false;
+    }
   }
 
   cancel() {
@@ -465,6 +508,12 @@ export class SelectionOverlay {
     ) {
       e.preventDefault();
       this.redo();
+    } else if (e.key === "Enter" && this.activeBox) {
+      e.preventDefault();
+      void this.exportToClipboard();
+    } else if ((e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S") && this.activeBox) {
+      e.preventDefault();
+      void this.exportToFile();
     }
   }
 

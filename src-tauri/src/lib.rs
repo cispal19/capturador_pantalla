@@ -5,9 +5,9 @@ pub mod ports;
 pub mod presentation;
 
 use presentation::commands::{
-    apply_obfuscation, cancel_capture_session, commit_selection_region, get_app_info,
-    get_connected_monitors, get_session_state, normalize_bounding_box, register_capture_shortcut,
-    sync_annotations, trigger_screen_capture,
+    apply_obfuscation, cancel_capture_session, commit_selection_region, copy_capture_to_clipboard,
+    get_app_info, get_connected_monitors, get_session_state, normalize_bounding_box,
+    register_capture_shortcut, save_capture_to_file, sync_annotations, trigger_screen_capture,
 };
 use presentation::tray::create_tray;
 
@@ -32,7 +32,9 @@ pub fn run() {
             cancel_capture_session,
             commit_selection_region,
             apply_obfuscation,
-            sync_annotations
+            sync_annotations,
+            copy_capture_to_clipboard,
+            save_capture_to_file
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

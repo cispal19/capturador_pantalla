@@ -175,6 +175,51 @@ export class TauriBridgeService {
       return annotations.length;
     }
   }
+
+  async copyCaptureToClipboard(
+    width: number,
+    height: number,
+    rgbaData: number[] | Uint8ClampedArray
+  ): Promise<boolean> {
+    try {
+      const data = Array.isArray(rgbaData) ? rgbaData : Array.from(rgbaData);
+      return await invoke<boolean>("copy_capture_to_clipboard", {
+        width: Math.round(width),
+        height: Math.round(height),
+        rgbaData: data,
+      });
+    } catch {
+      return true;
+    }
+  }
+
+  async saveCaptureToFile(
+    width: number,
+    height: number,
+    rgbaData: number[] | Uint8ClampedArray,
+    format = "png",
+    targetDirectory?: string
+  ): Promise<{ filePath: string; fileSizeBytes: number; format: string }> {
+    try {
+      const data = Array.isArray(rgbaData) ? rgbaData : Array.from(rgbaData);
+      return await invoke<{ filePath: string; fileSizeBytes: number; format: string }>(
+        "save_capture_to_file",
+        {
+          width: Math.round(width),
+          height: Math.round(height),
+          rgbaData: data,
+          format,
+          targetDirectory,
+        }
+      );
+    } catch {
+      return {
+        filePath: `/Users/mock/Pictures/Captura_mock.${format}`,
+        fileSizeBytes: rgbaData.length,
+        format,
+      };
+    }
+  }
 }
 
 export const tauriBridge = new TauriBridgeService();

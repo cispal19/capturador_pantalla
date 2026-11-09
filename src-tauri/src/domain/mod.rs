@@ -6,6 +6,7 @@ pub mod dimensions;
 pub mod display;
 pub mod error;
 pub mod handle;
+pub mod naming;
 pub mod obfuscation;
 
 pub use annotation::{Annotation, AnnotationTool, UndoRedoHistory};
@@ -16,4 +17,5 @@ pub use dimensions::Dimensions;
 pub use display::DisplayInfo;
 pub use error::DomainError;
 pub use handle::{HandleAnchor, ResizeHandle};
+pub use naming::FileNameGenerator;
 pub use obfuscation::{ObfuscationKernel, ObfuscationRegion};

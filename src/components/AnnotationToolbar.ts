@@ -16,6 +16,8 @@ export class AnnotationToolbar {
   private onThicknessChangeCallback?: (thickness: StrokeThickness) => void;
   private onUndoCallback?: () => void;
   private onRedoCallback?: () => void;
+  private onCopyCallback?: () => void;
+  private onSaveCallback?: () => void;
 
   constructor() {
     this.element = document.createElement("div");
@@ -82,6 +84,14 @@ export class AnnotationToolbar {
     this.onRedoCallback = cb;
   }
 
+  setOnCopy(cb: () => void) {
+    this.onCopyCallback = cb;
+  }
+
+  setOnSave(cb: () => void) {
+    this.onSaveCallback = cb;
+  }
+
   show() {
     this.element.style.display = "flex";
   }
@@ -93,7 +103,7 @@ export class AnnotationToolbar {
   updatePosition(box: SelectionRect, viewportW: number, viewportH: number) {
     this.show();
     const toolbarH = 46;
-    const toolbarW = 460;
+    const toolbarW = 620;
 
     let top = box.y + box.height + 8;
     // If overflows bottom margin, place on top
@@ -163,6 +173,37 @@ export class AnnotationToolbar {
       <div style="display: flex; gap: 4px; align-items: center;">
         <button type="button" data-action="undo" title="Deshacer (Ctrl+Z)" style="${this.btnStyle("select")}">↩️</button>
         <button type="button" data-action="redo" title="Rehacer (Ctrl+Y)" style="${this.btnStyle("select")}">↪️</button>
+      </div>
+
+      <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 4px;"></div>
+
+      <div style="display: flex; gap: 4px; align-items: center;">
+        <button type="button" data-action="copy" title="Copiar al portapapeles (Enter)" style="
+          background: #2563eb;
+          color: #ffffff;
+          border: none;
+          border-radius: 6px;
+          padding: 4px 10px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        ">📋 Copiar</button>
+        <button type="button" data-action="save" title="Guardar en disco (Cmd+S)" style="
+          background: #f1f5f9;
+          color: #0f172a;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+          padding: 4px 10px;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        ">💾 Guardar</button>
       </div>
     `;
 
@@ -245,6 +286,20 @@ export class AnnotationToolbar {
     if (redoBtn) {
       redoBtn.addEventListener("click", () => {
         if (this.onRedoCallback) this.onRedoCallback();
+      });
+    }
+
+    const copyBtn = this.element.querySelector('[data-action="copy"]');
+    if (copyBtn) {
+      copyBtn.addEventListener("click", () => {
+        if (this.onCopyCallback) this.onCopyCallback();
+      });
+    }
+
+    const saveBtn = this.element.querySelector('[data-action="save"]');
+    if (saveBtn) {
+      saveBtn.addEventListener("click", () => {
+        if (this.onSaveCallback) this.onSaveCallback();
       });
     }
   }

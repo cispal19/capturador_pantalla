@@ -167,4 +167,89 @@ describe("SelectionOverlay Component", () => {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "z", metaKey: true, shiftKey: true }));
     expect(overlay.getAnnotations()).toHaveLength(1);
   });
+
+  it("exports to clipboard on Enter key press when selection is active (Feature 005)", async () => {
+    const canvas = container.querySelector("canvas")!;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.getImageData = vi.fn().mockReturnValue({
+        width: 100,
+        height: 100,
+        data: new Uint8ClampedArray(100 * 100 * 4),
+      });
+    }
+
+    const exportSpy = vi.spyOn(overlay, "exportToClipboard");
+
+    // Create selection (100, 100, 200, 200)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 300, clientY: 300 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 300, clientY: 300 }));
+
+    expect(overlay.getActiveBox()).not.toBeNull();
+
+    // Press Enter
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+
+    expect(exportSpy).toHaveBeenCalledOnce();
+  });
+
+  it("exports to file on Cmd+S / Ctrl+S key press when selection is active (Feature 005)", async () => {
+    const canvas = container.querySelector("canvas")!;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.getImageData = vi.fn().mockReturnValue({
+        width: 100,
+        height: 100,
+        data: new Uint8ClampedArray(100 * 100 * 4),
+      });
+    }
+
+    const exportFileSpy = vi.spyOn(overlay, "exportToFile");
+
+    // Create selection (100, 100, 200, 200)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 300, clientY: 300 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 300, clientY: 300 }));
+
+    expect(overlay.getActiveBox()).not.toBeNull();
+
+    // Press Cmd+S
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "s", metaKey: true }));
+
+    expect(exportFileSpy).toHaveBeenCalledOnce();
+  });
+
+  it("triggers export from toolbar buttons (Feature 005)", async () => {
+    const canvas = container.querySelector("canvas")!;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.getImageData = vi.fn().mockReturnValue({
+        width: 100,
+        height: 100,
+        data: new Uint8ClampedArray(100 * 100 * 4),
+      });
+    }
+
+    const exportClipSpy = vi.spyOn(overlay, "exportToClipboard");
+    const exportFileSpy = vi.spyOn(overlay, "exportToFile");
+
+    // Create selection (100, 100, 200, 200)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 300, clientY: 300 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 300, clientY: 300 }));
+
+    const toolbarEl = overlay.getToolbar().getElement();
+    const copyBtn = toolbarEl.querySelector('[data-action="copy"]') as HTMLButtonElement;
+    const saveBtn = toolbarEl.querySelector('[data-action="save"]') as HTMLButtonElement;
+
+    expect(copyBtn).not.toBeNull();
+    expect(saveBtn).not.toBeNull();
+
+    copyBtn.click();
+    expect(exportClipSpy).toHaveBeenCalledOnce();
+
+    saveBtn.click();
+    expect(exportFileSpy).toHaveBeenCalledOnce();
+  });
 });

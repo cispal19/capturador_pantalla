@@ -23,7 +23,7 @@ description: "Task list for feature 005-output-clipboard-and-local-storage"
 
 **Purpose**: Add `arboard` crate dependency and storage formats
 
-- [ ] T001 Add `arboard = "3"` dependency and JPEG feature to `src-tauri/Cargo.toml`
+- [x] T001 Add `arboard = "3"` dependency and JPEG feature to `src-tauri/Cargo.toml`
 
 ---
 
@@ -33,12 +33,12 @@ description: "Task list for feature 005-output-clipboard-and-local-storage"
 
 **⚠️ CRITICAL**: Must write tests first and ensure they fail before implementing.
 
-- [ ] T002 [P] Write unit tests for `FileNameGenerator` in `src-tauri/src/domain/naming.rs`
-- [ ] T003 Implement `FileNameGenerator` in `src-tauri/src/domain/naming.rs` and export in `src-tauri/src/domain/mod.rs`
-- [ ] T004 [P] Write unit tests for `MockClipboardDriver` in `src-tauri/src/infrastructure/clipboard.rs`
-- [ ] T005 Implement `ArboardClipboardDriver` and `MockClipboardDriver` in `src-tauri/src/infrastructure/clipboard.rs` and export in `src-tauri/src/infrastructure/mod.rs`
-- [ ] T006 [P] Write unit tests for `FileSystemStorageDriver` in `src-tauri/src/infrastructure/storage.rs`
-- [ ] T007 Implement `FileSystemStorageDriver` encoding PNG/JPEG buffers in `src-tauri/src/infrastructure/storage.rs` and export in `src-tauri/src/infrastructure/mod.rs`
+- [x] T002 [P] Write unit tests for `FileNameGenerator` in `src-tauri/src/domain/naming.rs`
+- [x] T003 Implement `FileNameGenerator` in `src-tauri/src/domain/naming.rs` and export in `src-tauri/src/domain/mod.rs`
+- [x] T004 [P] Write unit tests for `MockClipboardDriver` in `src-tauri/src/infrastructure/clipboard.rs`
+- [x] T005 Implement `ArboardClipboardDriver` and `MockClipboardDriver` in `src-tauri/src/infrastructure/clipboard.rs` and export in `src-tauri/src/infrastructure/mod.rs`
+- [x] T006 [P] Write unit tests for `FileSystemStorageDriver` in `src-tauri/src/infrastructure/storage.rs`
+- [x] T007 Implement `FileSystemStorageDriver` encoding PNG/JPEG buffers in `src-tauri/src/infrastructure/storage.rs` and export in `src-tauri/src/infrastructure/mod.rs`
 
 **Checkpoint**: Foundational drivers and models tested and ready.
 
@@ -53,15 +53,15 @@ description: "Task list for feature 005-output-clipboard-and-local-storage"
 ### Tests for User Story 1 ⚠️
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T008 [P] [US1] Write unit tests for `ExportToClipboardUseCase` in `src-tauri/src/application/export.rs`
-- [ ] T009 [P] [US1] Write unit tests for `copy_capture_to_clipboard` IPC command in `src-tauri/src/presentation/commands.rs`
+- [x] T008 [P] [US1] Write unit tests for `ExportToClipboardUseCase` in `src-tauri/src/application/export.rs`
+- [x] T009 [P] [US1] Write unit tests for `copy_capture_to_clipboard` IPC command in `src-tauri/src/presentation/commands.rs`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Implement `ExportToClipboardUseCase` in `src-tauri/src/application/export.rs`
-- [ ] T011 [US1] Implement `copy_capture_to_clipboard` IPC command in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
-- [ ] T012 [US1] Implement `copyCaptureToClipboard` method in `src/services/tauriBridge.ts` with tests in `src/services/tauriBridge.test.ts`
-- [ ] T013 [US1] Add "Copiar (Enter)" action button to `AnnotationToolbar.ts` and handle `Enter` key in `SelectionOverlay.ts`
+- [x] T010 [US1] Implement `ExportToClipboardUseCase` in `src-tauri/src/application/export.rs`
+- [x] T011 [US1] Implement `copy_capture_to_clipboard` IPC command in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
+- [x] T012 [US1] Implement `copyCaptureToClipboard` method in `src/services/tauriBridge.ts` with tests in `src/services/tauriBridge.test.ts`
+- [x] T013 [US1] Add "Copiar (Enter)" action button to `AnnotationToolbar.ts` and handle `Enter` key in `SelectionOverlay.ts`
 
 **Checkpoint**: User Story 1 is functional: users can press `Enter` or click "Copiar" to transfer screenshot to clipboard.
 
@@ -76,15 +76,15 @@ description: "Task list for feature 005-output-clipboard-and-local-storage"
 ### Tests for User Story 2 ⚠️
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T014 [P] [US2] Write unit tests for `ExportToFileUseCase` in `src-tauri/src/application/export.rs`
-- [ ] T015 [P] [US2] Write unit tests for `save_capture_to_file` IPC command in `src-tauri/src/presentation/commands.rs`
+- [x] T014 [P] [US2] Write unit tests for `ExportToFileUseCase` in `src-tauri/src/application/export.rs`
+- [x] T015 [P] [US2] Write unit tests for `save_capture_to_file` IPC command in `src-tauri/src/presentation/commands.rs`
 
 ### Implementation for User Story 2
 
-- [ ] T016 [US2] Implement `ExportToFileUseCase` in `src-tauri/src/application/export.rs`
-- [ ] T017 [US2] Implement `save_capture_to_file` IPC command in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
-- [ ] T018 [US2] Implement `saveCaptureToFile` in `src/services/tauriBridge.ts` with tests in `src/services/tauriBridge.test.ts`
-- [ ] T019 [US2] Add "Guardar (Cmd+S)" action button to `AnnotationToolbar.ts` and handle `Cmd+S` / `Ctrl+S` in `SelectionOverlay.ts`
+- [x] T016 [US2] Implement `ExportToFileUseCase` in `src-tauri/src/application/export.rs`
+- [x] T017 [US2] Implement `save_capture_to_file` IPC command in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
+- [x] T018 [US2] Implement `saveCaptureToFile` in `src/services/tauriBridge.ts` with tests in `src/services/tauriBridge.test.ts`
+- [x] T019 [US2] Add "Guardar (Cmd+S)" action button to `AnnotationToolbar.ts` and handle `Cmd+S` / `Ctrl+S` in `SelectionOverlay.ts`
 
 **Checkpoint**: User Stories 1 and 2 are functional: clipboard copy and disk saving work cleanly.
 
@@ -98,12 +98,12 @@ description: "Task list for feature 005-output-clipboard-and-local-storage"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T020 [P] [US3] Write unit tests for toast notification helper in `src/components/Toast.test.ts`
+- [x] T020 [P] [US3] Write unit tests for toast notification helper in `src/components/Toast.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Implement `showToast(message)` helper in `src/components/Toast.ts`
-- [ ] T022 [US3] Wire toast notification upon copy or save in `src/components/SelectionOverlay.ts`
+- [x] T021 [US3] Implement `showToast(message)` helper in `src/components/Toast.ts`
+- [x] T022 [US3] Wire toast notification upon copy or save in `src/components/SelectionOverlay.ts`
 
 **Checkpoint**: All user stories complete and functional.
 
@@ -113,9 +113,9 @@ description: "Task list for feature 005-output-clipboard-and-local-storage"
 
 **Purpose**: Documentation, quickstart validation, and quality gates
 
-- [ ] T023 [P] Update `README.md` with clipboard copy and local save instructions
-- [ ] T024 Execute quickstart validation following `specs/005-output-clipboard-and-local-storage/quickstart.md`
-- [ ] T025 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)
+- [x] T023 [P] Update `README.md` with clipboard copy and local save instructions
+- [x] T024 Execute quickstart validation following `specs/005-output-clipboard-and-local-storage/quickstart.md`
+- [x] T025 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)
 
 ---
 
