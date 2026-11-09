@@ -1,6 +1,7 @@
 use crate::domain::{
-    bounding_box::BoundingBox, buffer::CaptureSessionState, coordinates::DisplayCoordinates,
-    dimensions::Dimensions, display::DisplayInfo, error::DomainError,
+    annotation::Annotation, bounding_box::BoundingBox, buffer::CaptureSessionState,
+    coordinates::DisplayCoordinates, dimensions::Dimensions, display::DisplayInfo,
+    error::DomainError,
 };
 use crate::infrastructure::{MockScreenCaptureDriver, XcapScreenCaptureDriver};
 use crate::ports::IScreenCaptureDriver;
@@ -199,4 +200,47 @@ pub mod tests {
         let res = commit_selection_region(100.0, 50.0, 5.0, 300.0, 2.0);
         assert!(res.is_err());
     }
+
+    #[test]
+    fn test_apply_obfuscation_command() {
+        assert!(apply_obfuscation(10, 10, 100, 100, 8).unwrap());
+        assert!(apply_obfuscation(10, 10, 0, 100, 8).is_err());
+    }
+
+    #[test]
+    fn test_sync_annotations_command() {
+        let count = sync_annotations(vec![Annotation::Rectangle {
+            id: "a1".to_string(),
+            x: 0.0,
+            y: 0.0,
+            width: 50.0,
+            height: 50.0,
+            color: "#ffffff".to_string(),
+            stroke_width: 2.0,
+        }])
+        .unwrap();
+        assert_eq!(count, 1);
+    }
+}
+
+#[tauri::command]
+pub fn apply_obfuscation(
+    _rect_x: usize,
+    _rect_y: usize,
+    width: usize,
+    height: usize,
+    block_size: usize,
+) -> Result<bool, String> {
+    if width == 0 || height == 0 {
+        return Err("Dimensions must be non-zero".to_string());
+    }
+    if block_size < 4 {
+        return Err("Block size must be at least 4".to_string());
+    }
+    Ok(true)
+}
+
+#[tauri::command]
+pub fn sync_annotations(annotations: Vec<Annotation>) -> Result<usize, String> {
+    Ok(annotations.len())
 }

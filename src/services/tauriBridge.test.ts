@@ -66,4 +66,14 @@ describe("TauriBridgeService", () => {
     expect(bbox.physical_rect.width).toBe(1200);
     expect(bbox.physical_rect.height).toBe(800);
   });
+
+  it("applies obfuscation filter", async () => {
+    const success = await tauriBridge.applyObfuscation(50, 50, 200, 100, 12);
+    expect(success).toBe(true);
+  });
+
+  it("synchronizes vector annotations to backend", async () => {
+    const count = await tauriBridge.syncAnnotations([{ type: "rectangle", id: "1" }]);
+    expect(count).toBe(1);
+  });
 });

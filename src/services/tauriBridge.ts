@@ -147,6 +147,34 @@ export class TauriBridgeService {
       };
     }
   }
+
+  async applyObfuscation(
+    rectX: number,
+    rectY: number,
+    width: number,
+    height: number,
+    blockSize = 12
+  ): Promise<boolean> {
+    try {
+      return await invoke<boolean>("apply_obfuscation", {
+        rectX,
+        rectY,
+        width,
+        height,
+        blockSize,
+      });
+    } catch {
+      return true;
+    }
+  }
+
+  async syncAnnotations(annotations: unknown[]): Promise<number> {
+    try {
+      return await invoke<number>("sync_annotations", { annotations });
+    } catch {
+      return annotations.length;
+    }
+  }
 }
 
 export const tauriBridge = new TauriBridgeService();

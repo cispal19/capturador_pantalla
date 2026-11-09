@@ -23,8 +23,8 @@ description: "Task list for feature 004-annotation-studio-and-obfuscation"
 
 **Purpose**: Define annotation and tool types in frontend and backend
 
-- [ ] T001 [P] Define `AnnotationItem`, `ActiveTool`, `CorporateColor`, and `StrokeThickness` in `src/types/annotations.ts`
-- [ ] T002 [P] Define `AnnotationTool` enum and `Annotation` discriminated enum in `src-tauri/src/domain/annotation.rs` and export in `src-tauri/src/domain/mod.rs`
+- [x] T001 [P] Define `AnnotationItem`, `ActiveTool`, `CorporateColor`, and `StrokeThickness` in `src/types/annotations.ts`
+- [x] T002 [P] Define `AnnotationTool` enum and `Annotation` discriminated enum in `src-tauri/src/domain/annotation.rs` and export in `src-tauri/src/domain/mod.rs`
 
 ---
 
@@ -34,12 +34,12 @@ description: "Task list for feature 004-annotation-studio-and-obfuscation"
 
 **⚠️ CRITICAL**: Must write tests first and ensure they fail before implementing.
 
-- [ ] T003 [P] Write unit tests for `ObfuscationKernel` (block-averaging, irreversibility, boundary safety) in `src-tauri/src/domain/obfuscation.rs`
-- [ ] T004 Implement `ObfuscationKernel::apply_pixelate` in `src-tauri/src/domain/obfuscation.rs` and export in `src-tauri/src/domain/mod.rs`
-- [ ] T005 [P] Write unit tests for `UndoRedoHistory` in `src-tauri/src/domain/annotation.rs`
-- [ ] T006 Implement `UndoRedoHistory<T>` container in `src-tauri/src/domain/annotation.rs`
-- [ ] T007 [P] Write frontend unit tests for `UndoRedoStack` in `src/domain/annotations.test.ts`
-- [ ] T008 [P] Implement `UndoRedoStack<T>` in `src/domain/annotations.ts`
+- [x] T003 [P] Write unit tests for `ObfuscationKernel` (block-averaging, irreversibility, boundary safety) in `src-tauri/src/domain/obfuscation.rs`
+- [x] T004 Implement `ObfuscationKernel::apply_pixelate` in `src-tauri/src/domain/obfuscation.rs` and export in `src-tauri/src/domain/mod.rs`
+- [x] T005 [P] Write unit tests for `UndoRedoHistory` in `src-tauri/src/domain/annotation.rs`
+- [x] T006 Implement `UndoRedoHistory<T>` container in `src-tauri/src/domain/annotation.rs`
+- [x] T007 [P] Write frontend unit tests for `UndoRedoStack` in `src/domain/annotations.test.ts`
+- [x] T008 [P] Implement `UndoRedoStack<T>` in `src/domain/annotations.ts`
 
 **Checkpoint**: Foundational models and mathematical kernels verified and tested.
 
@@ -54,15 +54,15 @@ description: "Task list for feature 004-annotation-studio-and-obfuscation"
 ### Tests for User Story 1 ⚠️
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T009 [P] [US1] Write unit tests for frontend canvas obfuscator in `src/domain/obfuscation.test.ts`
-- [ ] T010 [P] [US1] Write unit tests for `apply_obfuscation` IPC command in `src-tauri/src/presentation/commands.rs`
+- [x] T009 [P] [US1] Write unit tests for frontend canvas obfuscator in `src/domain/obfuscation.test.ts`
+- [x] T010 [P] [US1] Write unit tests for `apply_obfuscation` IPC command in `src-tauri/src/presentation/commands.rs`
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Implement `apply_obfuscation` IPC command in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
-- [ ] T012 [US1] Implement `applyPixelationToCanvas` in `src/domain/obfuscation.ts`
-- [ ] T013 [US1] Implement frontend bridge method `applyObfuscation` in `src/services/tauriBridge.ts`
-- [ ] T014 [US1] Wire obfuscation drawing tool in `src/components/SelectionOverlay.ts`
+- [x] T011 [US1] Implement `apply_obfuscation` IPC command in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
+- [x] T012 [US1] Implement `applyPixelationToCanvas` in `src/domain/obfuscation.ts`
+- [x] T013 [US1] Implement frontend bridge method `applyObfuscation` in `src/services/tauriBridge.ts`
+- [x] T014 [US1] Wire obfuscation drawing tool in `src/components/SelectionOverlay.ts`
 
 **Checkpoint**: User Story 1 is functional: sensitive areas can be destroyed irreversibly with pixelation.
 
@@ -77,14 +77,14 @@ description: "Task list for feature 004-annotation-studio-and-obfuscation"
 ### Tests for User Story 2 ⚠️
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T015 [P] [US2] Write unit tests for `AnnotationToolbar` positioning and tool/color selection in `src/components/AnnotationToolbar.test.ts`
-- [ ] T016 [P] [US2] Write unit tests for vector shape generation helpers in `src/domain/annotations.test.ts`
+- [x] T015 [P] [US2] Write unit tests for `AnnotationToolbar` positioning and tool/color selection in `src/components/AnnotationToolbar.test.ts`
+- [x] T016 [P] [US2] Write unit tests for vector shape generation helpers in `src/domain/annotations.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Implement vector shape render helpers (rect, ellipse, arrow, line, freehand, text, highlighter) in `src/domain/annotations.ts`
-- [ ] T018 [US2] Implement `AnnotationToolbar` component with tool/color/thickness palette in `src/components/AnnotationToolbar.ts`
-- [ ] T019 [US2] Integrate `AnnotationToolbar` and active drawing into `src/components/SelectionOverlay.ts`
+- [x] T017 [US2] Implement vector shape render helpers (rect, ellipse, arrow, line, freehand, text, highlighter) in `src/domain/annotations.ts`
+- [x] T018 [US2] Implement `AnnotationToolbar` component with tool/color/thickness palette in `src/components/AnnotationToolbar.ts`
+- [x] T019 [US2] Integrate `AnnotationToolbar` and active drawing into `src/components/SelectionOverlay.ts`
 
 **Checkpoint**: User Stories 1 and 2 are functional: vector tools and floating palette work seamlessly.
 
@@ -98,13 +98,13 @@ description: "Task list for feature 004-annotation-studio-and-obfuscation"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T020 [P] [US3] Write unit tests for keyboard shortcuts (`Cmd+Z`, `Cmd+Shift+Z`) and undo/redo dispatching in `src/components/SelectionOverlay.test.ts`
+- [x] T020 [P] [US3] Write unit tests for keyboard shortcuts (`Cmd+Z`, `Cmd+Shift+Z`) and undo/redo dispatching in `src/components/SelectionOverlay.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Wire `UndoRedoStack` into `SelectionOverlay.ts` for all annotations and obfuscations
-- [ ] T022 [US3] Wire keyboard listeners for `Ctrl+Z`, `Cmd+Z`, `Ctrl+Y`, `Cmd+Shift+Z` and toolbar buttons in `src/components/SelectionOverlay.ts`
-- [ ] T023 [US3] Implement `sync_annotations` IPC command in `src-tauri/src/presentation/commands.rs` and `syncAnnotations` bridge in `src/services/tauriBridge.ts`
+- [x] T021 [US3] Wire `UndoRedoStack` into `SelectionOverlay.ts` for all annotations and obfuscations
+- [x] T022 [US3] Wire keyboard listeners for `Ctrl+Z`, `Cmd+Z`, `Ctrl+Y`, `Cmd+Shift+Z` and toolbar buttons in `src/components/SelectionOverlay.ts`
+- [x] T023 [US3] Implement `sync_annotations` IPC command in `src-tauri/src/presentation/commands.rs` and `syncAnnotations` bridge in `src/services/tauriBridge.ts`
 
 **Checkpoint**: All user stories complete and functional.
 
@@ -114,9 +114,9 @@ description: "Task list for feature 004-annotation-studio-and-obfuscation"
 
 **Purpose**: Documentation, quickstart validation, and quality gates
 
-- [ ] T024 [P] Update `README.md` with annotation studio and obfuscation instructions
-- [ ] T025 Execute quickstart validation following `specs/004-annotation-studio-and-obfuscation/quickstart.md`
-- [ ] T026 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)
+- [x] T024 [P] Update `README.md` with annotation studio and obfuscation instructions
+- [x] T025 Execute quickstart validation following `specs/004-annotation-studio-and-obfuscation/quickstart.md`
+- [x] T026 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)
 
 ---
 

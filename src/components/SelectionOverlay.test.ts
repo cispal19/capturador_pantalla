@@ -109,4 +109,62 @@ describe("SelectionOverlay Component", () => {
     expect(overlay.getActiveBox()).toBeNull();
     expect(overlay.getState().mode).toBe("idle");
   });
+
+  it("draws vector rectangle annotation inside active selection box (Feature 004)", () => {
+    const canvas = container.querySelector("canvas")!;
+
+    // Create selection (100, 100, 400, 300)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 500, clientY: 400 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 500, clientY: 400 }));
+
+    // Switch to rectangle tool
+    const toolbar = overlay.getToolbar();
+    const rectBtn = toolbar
+      .getElement()
+      .querySelector('[data-tool="rectangle"]') as HTMLButtonElement;
+    rectBtn.click();
+    expect(toolbar.getActiveTool()).toBe("rectangle");
+
+    // Draw rectangle annotation from (150, 150) to (250, 250)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 150, clientY: 150 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 250, clientY: 250 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 250, clientY: 250 }));
+
+    const annos = overlay.getAnnotations();
+    expect(annos).toHaveLength(1);
+    expect(annos[0].type).toBe("rectangle");
+  });
+
+  it("applies obfuscation annotation and handles Undo/Redo shortcuts (Feature 004)", () => {
+    const canvas = container.querySelector("canvas")!;
+
+    // Create selection (100, 100, 400, 300)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 500, clientY: 400 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 500, clientY: 400 }));
+
+    // Switch to obfuscation tool
+    const toolbar = overlay.getToolbar();
+    const obfBtn = toolbar
+      .getElement()
+      .querySelector('[data-tool="obfuscation"]') as HTMLButtonElement;
+    obfBtn.click();
+
+    // Draw obfuscation box from (200, 200) to (300, 250)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 200, clientY: 200 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 300, clientY: 250 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 300, clientY: 250 }));
+
+    expect(overlay.getAnnotations()).toHaveLength(1);
+    expect(overlay.getAnnotations()[0].type).toBe("obfuscation");
+
+    // Undo via Cmd+Z
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "z", metaKey: true }));
+    expect(overlay.getAnnotations()).toHaveLength(0);
+
+    // Redo via Cmd+Shift+Z
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "z", metaKey: true, shiftKey: true }));
+    expect(overlay.getAnnotations()).toHaveLength(1);
+  });
 });

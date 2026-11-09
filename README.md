@@ -74,6 +74,26 @@ Al dispararse la captura, se proyecta un overlay transparente acelerado por hard
 
 ---
 
+## 🎨 Estudio de Anotaciones y Ofuscación Destructiva (Blur / Pixelate)
+
+Una vez delimitada la selección, se despliega una barra de herramientas flotante inteligente:
+- **Herramientas Vectoriales**:
+  - Rectángulo (`R`) y Elipse con bordes nítidos.
+  - Flecha indicadora (`A`) y Línea recta con punta direccional calibrada.
+  - Lápiz de trazo libre continuo y Resaltador semitransparente (35% opacidad).
+  - Texto tipográfico editable (`T`) con tamaño legible.
+- **Herramienta Obligatoria de Ofuscación Destructiva (`B`)**:
+  - Algoritmo de pixelado irreversible por promediado de bloques (`ObfuscationKernel`).
+  - Aplana permanentemente las variaciones de alta frecuencia (contraseñas, tokens JWT, PII), haciendo imposible su reconstrucción mediante filtros o IA.
+- **Paleta y Calibre**:
+  - 6 colores corporativos (Rojo, Verde, Azul, Amarillo, Blanco, Negro).
+  - 3 niveles de grosor de trazo (1x fino, 2x medio, 3x grueso).
+- **Historial Completo Deshacer / Rehacer**:
+  - Deshacer con `Ctrl+Z` / `Cmd+Z` o botón en barra.
+  - Rehacer con `Ctrl+Y` / `Cmd+Shift+Z` o botón en barra.
+
+---
+
 ### Pruebas Automatizadas (TDD)
 ```bash
 # Ejecutar pruebas unitarias de frontend
