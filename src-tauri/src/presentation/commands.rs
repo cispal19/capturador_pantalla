@@ -7,10 +7,11 @@ use crate::domain::{
     display::DisplayInfo,
     error::DomainError,
     naming::FileNameGenerator,
+    preferences::AppPreferences,
 };
 use crate::infrastructure::{
-    ArboardClipboardDriver, FileSystemStorageDriver, MockClipboardDriver, MockScreenCaptureDriver,
-    XcapScreenCaptureDriver,
+    ArboardClipboardDriver, FileSystemStorageDriver, JsonConfigStoreDriver, MockClipboardDriver,
+    MockScreenCaptureDriver, XcapScreenCaptureDriver,
 };
 use crate::ports::{IClipboardDriver, IFileSystemDriver, IScreenCaptureDriver, ImageFileFormat};
 use serde::{Deserialize, Serialize};
@@ -252,6 +253,20 @@ pub mod tests {
         assert!(std::path::Path::new(&res.file_path).exists());
         let _ = std::fs::remove_file(res.file_path);
     }
+
+    #[test]
+    fn test_preferences_commands_lifecycle() {
+        let prefs = get_preferences().unwrap();
+        assert_eq!(prefs.default_image_format, "png");
+
+        let mut custom = prefs.clone();
+        custom.default_image_format = "jpeg".to_string();
+        let updated = update_preferences(custom.clone()).unwrap();
+        assert_eq!(updated.default_image_format, "jpeg");
+
+        let reset = reset_preferences().unwrap();
+        assert_eq!(reset.default_image_format, "png");
+    }
 }
 
 #[tauri::command]
@@ -380,4 +395,26 @@ pub fn save_capture_to_file(
         file_size_bytes: size,
         format: ext,
     })
+}
+
+#[tauri::command]
+pub fn get_preferences() -> Result<AppPreferences, String> {
+    let store = JsonConfigStoreDriver::default();
+    Ok(store.load())
+}
+
+#[tauri::command]
+pub fn update_preferences(preferences: AppPreferences) -> Result<AppPreferences, String> {
+    preferences.validate()?;
+    let store = JsonConfigStoreDriver::default();
+    store.save(&preferences)?;
+    Ok(preferences)
+}
+
+#[tauri::command]
+pub fn reset_preferences() -> Result<AppPreferences, String> {
+    let defaults = AppPreferences::default();
+    let store = JsonConfigStoreDriver::default();
+    store.save(&defaults)?;
+    Ok(defaults)
 }

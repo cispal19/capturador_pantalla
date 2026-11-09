@@ -102,4 +102,10 @@ pub trait IGlobalShortcutDriver: Send + Sync {
 
     /// Unregisters all registered hotkeys
     fn unregister_all(&self) -> Result<(), ShortcutDriverError>;
+
+    /// Unregisters a specific hotkey
+    fn unregister_shortcut(&self, accelerator: &str) -> Result<(), ShortcutDriverError> {
+        let _ = accelerator;
+        self.unregister_all()
+    }
 }

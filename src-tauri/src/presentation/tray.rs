@@ -1,7 +1,7 @@
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{TrayIcon, TrayIconBuilder},
-    AppHandle, Runtime,
+    AppHandle, Emitter, Runtime,
 };
 
 pub fn create_tray<R: Runtime>(app: &AppHandle<R>) -> Result<TrayIcon<R>, tauri::Error> {
@@ -23,10 +23,10 @@ pub fn create_tray<R: Runtime>(app: &AppHandle<R>) -> Result<TrayIcon<R>, tauri:
         .show_menu_on_left_click(true)
         .on_menu_event(|app, event| match event.id.as_ref() {
             "capture" => {
-                // Handled via IPC / internal event
+                let _ = app.emit("trigger-capture", ());
             }
             "preferences" => {
-                // Handled via preferences window
+                let _ = app.emit("open-preferences", ());
             }
             "quit" => {
                 app.exit(0);

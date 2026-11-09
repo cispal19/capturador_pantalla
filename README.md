@@ -109,6 +109,24 @@ Una vez finalizada la selección y anotación de la captura:
 
 ---
 
+## ⚙️ Panel de Configuración y Preferencias de Usuario
+
+La aplicación proporciona un panel de configuración completo y accesible:
+- **Persistencia Segura en Espacio de Usuario (Local-First)**:
+  - Todas las preferencias se almacenan en un archivo JSON estándar (`~/.config/capturador-pantalla/config.json` en Unix/macOS, `%APPDATA%\capturador-pantalla\config.json` en Windows).
+  - Cero requisitos de privilegios de superusuario/administrador (BR-005).
+  - Tolerancia y autorecuperación: Si el archivo se corrompe, se repara automáticamente a valores seguros por defecto.
+- **Re-registro Dinámico de Atajos Globales**:
+  - Cambio interactivo de la combinación de teclas de captura con re-registro inmediato a nivel de sistema operativo sin necesidad de reiniciar el proceso.
+- **Personalización de Almacenamiento y Salida**:
+  - Selector de carpeta de guardado automático personalizada.
+  - Selección de formato de imagen predeterminado (PNG de máxima fidelidad o JPEG optimizado).
+  - Opciones de copiado automático al portapapeles y activación/desactivación de notificaciones toast.
+- **Acceso Ergonómico**:
+  - Botón de acceso rápido en la vista principal y opción "Preferencias..." en el menú del System Tray.
+
+---
+
 ### Pruebas Automatizadas (TDD)
 ```bash
 # Ejecutar pruebas unitarias de frontend

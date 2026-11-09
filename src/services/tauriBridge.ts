@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { type AppPreferences, DEFAULT_PREFERENCES } from "../types/preferences";
 import type {
   AppInfo,
   BoundingBox,
@@ -218,6 +219,30 @@ export class TauriBridgeService {
         fileSizeBytes: rgbaData.length,
         format,
       };
+    }
+  }
+
+  async getPreferences(): Promise<AppPreferences> {
+    try {
+      return await invoke<AppPreferences>("get_preferences");
+    } catch {
+      return { ...DEFAULT_PREFERENCES };
+    }
+  }
+
+  async updatePreferences(preferences: AppPreferences): Promise<AppPreferences> {
+    try {
+      return await invoke<AppPreferences>("update_preferences", { preferences });
+    } catch {
+      return { ...preferences };
+    }
+  }
+
+  async resetPreferences(): Promise<AppPreferences> {
+    try {
+      return await invoke<AppPreferences>("reset_preferences");
+    } catch {
+      return { ...DEFAULT_PREFERENCES };
     }
   }
 }

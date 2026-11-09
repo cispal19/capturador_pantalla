@@ -23,7 +23,7 @@ description: "Task list for feature 006-settings-and-user-preferences"
 
 **Purpose**: Shared interfaces and frontend/backend types for configuration
 
-- [ ] T001 Define TypeScript `AppPreferences` interface and defaults in `src/types/preferences.ts`
+- [x] T001 Define TypeScript `AppPreferences` interface and defaults in `src/types/preferences.ts`
 
 ---
 
@@ -33,10 +33,10 @@ description: "Task list for feature 006-settings-and-user-preferences"
 
 **⚠️ CRITICAL**: Must write tests first and ensure they fail before implementing.
 
-- [ ] T002 [P] Write unit tests for `AppPreferences` domain struct, validation, and serialization in `src-tauri/src/domain/preferences.rs`
-- [ ] T003 Implement `AppPreferences` in `src-tauri/src/domain/preferences.rs` and export in `src-tauri/src/domain/mod.rs`
-- [ ] T004 [P] Write unit tests for `JsonConfigStoreDriver` in `src-tauri/src/infrastructure/config_store.rs`
-- [ ] T005 Implement `JsonConfigStoreDriver` in `src-tauri/src/infrastructure/config_store.rs` and export in `src-tauri/src/infrastructure/mod.rs`
+- [x] T002 [P] Write unit tests for `AppPreferences` domain struct, validation, and serialization in `src-tauri/src/domain/preferences.rs`
+- [x] T003 Implement `AppPreferences` in `src-tauri/src/domain/preferences.rs` and export in `src-tauri/src/domain/mod.rs`
+- [x] T004 [P] Write unit tests for `JsonConfigStoreDriver` in `src-tauri/src/infrastructure/config_store.rs`
+- [x] T005 Implement `JsonConfigStoreDriver` in `src-tauri/src/infrastructure/config_store.rs` and export in `src-tauri/src/infrastructure/mod.rs`
 
 **Checkpoint**: Foundational model and JSON store driver tested and ready.
 
@@ -51,14 +51,14 @@ description: "Task list for feature 006-settings-and-user-preferences"
 ### Tests for User Story 1 ⚠️
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T006 [P] [US1] Write unit tests for `ManagePreferencesUseCase` in `src-tauri/src/application/preferences.rs`
-- [ ] T007 [P] [US1] Write unit tests for IPC commands (`get_preferences`, `update_preferences`, `reset_preferences`) in `src-tauri/src/presentation/commands.rs`
+- [x] T006 [P] [US1] Write unit tests for `ManagePreferencesUseCase` in `src-tauri/src/application/preferences.rs`
+- [x] T007 [P] [US1] Write unit tests for IPC commands (`get_preferences`, `update_preferences`, `reset_preferences`) in `src-tauri/src/presentation/commands.rs`
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Implement `ManagePreferencesUseCase` in `src-tauri/src/application/preferences.rs` and export in `src-tauri/src/application/mod.rs`
-- [ ] T009 [US1] Implement IPC commands in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
-- [ ] T010 [US1] Implement preferences bridge methods in `src/services/tauriBridge.ts` with tests in `src/services/tauriBridge.test.ts`
+- [x] T008 [US1] Implement `ManagePreferencesUseCase` in `src-tauri/src/application/preferences.rs` and export in `src-tauri/src/application/mod.rs`
+- [x] T009 [US1] Implement IPC commands in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
+- [x] T010 [US1] Implement preferences bridge methods in `src/services/tauriBridge.ts` with tests in `src/services/tauriBridge.test.ts`
 
 **Checkpoint**: User Story 1 is functional: preferences are read and persisted via IPC.
 
@@ -73,11 +73,11 @@ description: "Task list for feature 006-settings-and-user-preferences"
 ### Tests for User Story 2 ⚠️
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T011 [P] [US2] Write unit tests for dynamic shortcut re-registration and error rollback in `src-tauri/src/application/preferences.rs`
+- [x] T011 [P] [US2] Write unit tests for dynamic shortcut re-registration and error rollback in `src-tauri/src/application/preferences.rs`
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] Implement dynamic shortcut re-registration in `ManagePreferencesUseCase` and update `IGlobalShortcutDriver`
+- [x] T012 [US2] Implement dynamic shortcut re-registration in `ManagePreferencesUseCase` and update `IGlobalShortcutDriver`
 
 **Checkpoint**: User Stories 1 and 2 are functional: shortcuts re-register dynamically.
 
@@ -91,12 +91,12 @@ description: "Task list for feature 006-settings-and-user-preferences"
 
 ### Tests for User Stories 3 & 4 ⚠️
 
-- [ ] T013 [P] [US3] Write unit tests for `SettingsModal` in `src/components/SettingsModal.test.ts`
+- [x] T013 [P] [US3] Write unit tests for `SettingsModal` in `src/components/SettingsModal.test.ts`
 
 ### Implementation for User Stories 3 & 4
 
-- [ ] T014 [US3] Implement `SettingsModal` component in `src/components/SettingsModal.ts`
-- [ ] T015 [US4] Connect System Tray "Preferencias..." option and settings toggle in main view
+- [x] T014 [US3] Implement `SettingsModal` component in `src/components/SettingsModal.ts`
+- [x] T015 [US4] Connect System Tray "Preferencias..." option and settings toggle in main view
 
 **Checkpoint**: Full end-to-end user experience with UI modal and tray integration.
 
@@ -106,6 +106,6 @@ description: "Task list for feature 006-settings-and-user-preferences"
 
 **Purpose**: Documentation, quickstart validation, and quality gates
 
-- [ ] T016 [P] Update `README.md` with configuration options and local file path documentation
-- [ ] T017 Execute quickstart verification (`specs/006-settings-and-user-preferences/quickstart.md`)
-- [ ] T018 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)
+- [x] T016 [P] Update `README.md` with configuration options and local file path documentation
+- [x] T017 Execute quickstart verification (`specs/006-settings-and-user-preferences/quickstart.md`)
+- [x] T018 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)

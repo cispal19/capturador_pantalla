@@ -44,4 +44,10 @@ impl IGlobalShortcutDriver for TauriGlobalShortcutDriver {
         map.clear();
         Ok(())
     }
+
+    fn unregister_shortcut(&self, accelerator: &str) -> Result<(), ShortcutDriverError> {
+        let mut map = self.registered.lock().unwrap();
+        map.remove(accelerator);
+        Ok(())
+    }
 }

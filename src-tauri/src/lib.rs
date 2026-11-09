@@ -6,8 +6,9 @@ pub mod presentation;
 
 use presentation::commands::{
     apply_obfuscation, cancel_capture_session, commit_selection_region, copy_capture_to_clipboard,
-    get_app_info, get_connected_monitors, get_session_state, normalize_bounding_box,
-    register_capture_shortcut, save_capture_to_file, sync_annotations, trigger_screen_capture,
+    get_app_info, get_connected_monitors, get_preferences, get_session_state,
+    normalize_bounding_box, register_capture_shortcut, reset_preferences, save_capture_to_file,
+    sync_annotations, trigger_screen_capture, update_preferences,
 };
 use presentation::tray::create_tray;
 
@@ -34,7 +35,10 @@ pub fn run() {
             apply_obfuscation,
             sync_annotations,
             copy_capture_to_clipboard,
-            save_capture_to_file
+            save_capture_to_file,
+            get_preferences,
+            update_preferences,
+            reset_preferences
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

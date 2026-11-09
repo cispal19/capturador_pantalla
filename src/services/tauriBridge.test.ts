@@ -88,4 +88,22 @@ describe("TauriBridgeService", () => {
     expect(res.filePath).toBeDefined();
     expect(res.fileSizeBytes).toBe(400);
   });
+
+  it("fetches, updates, and resets user preferences", async () => {
+    const prefs = await tauriBridge.getPreferences();
+    expect(prefs.capture_shortcut).toBeDefined();
+    expect(prefs.default_image_format).toBe("png");
+
+    const updated = await tauriBridge.updatePreferences({
+      ...prefs,
+      default_image_format: "jpeg",
+      autostart_enabled: true,
+    });
+    expect(updated.default_image_format).toBe("jpeg");
+    expect(updated.autostart_enabled).toBe(true);
+
+    const reset = await tauriBridge.resetPreferences();
+    expect(reset.default_image_format).toBe("png");
+    expect(reset.autostart_enabled).toBe(false);
+  });
 });
