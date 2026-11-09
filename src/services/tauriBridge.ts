@@ -100,6 +100,24 @@ export class TauriBridgeService {
     }
   }
 
+  async startCapture(displayId?: number): Promise<CaptureTriggerResult> {
+    try {
+      return await invoke<CaptureTriggerResult>("start_capture_session_flow", {
+        displayId,
+      });
+    } catch {
+      return this.triggerScreenCapture(displayId);
+    }
+  }
+
+  async hideCaptureOverlay(): Promise<void> {
+    try {
+      await invoke("hide_capture_overlay");
+    } catch {
+      // Ignored outside Tauri
+    }
+  }
+
   async registerCaptureShortcut(
     accelerator: string
   ): Promise<{ registered: boolean; accelerator: string }> {

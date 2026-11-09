@@ -217,6 +217,66 @@ pub fn trigger_screen_capture(display_id: Option<u32>) -> Result<CaptureTriggerR
 }
 
 #[tauri::command]
+pub fn start_capture_session_flow(
+    app: tauri::AppHandle,
+    display_id: Option<u32>,
+) -> Result<CaptureTriggerResponse, String> {
+    use tauri::{Emitter, Manager};
+
+    // 1. Hide main dashboard window so it does not get captured in screenshot
+    if let Some(main_win) = app.get_webview_window("main") {
+        let _ = main_win.hide();
+    }
+
+    // 2. Allow 200ms for OS compositor to clear the main window from the screen
+    std::thread::sleep(std::time::Duration::from_millis(200));
+
+    // 3. Capture desktop screenshot via xcap
+    let capture_res = trigger_screen_capture(display_id)?;
+
+    // 4. Position and show the overlay window
+    if let Some(overlay_win) = app.get_webview_window("overlay") {
+        let target_mon = overlay_win
+            .current_monitor()
+            .ok()
+            .flatten()
+            .or_else(|| overlay_win.primary_monitor().ok().flatten());
+
+        if let Some(mon) = target_mon {
+            let size = mon.size();
+            let pos = mon.position();
+            let _ = overlay_win.set_position(tauri::Position::Physical(*pos));
+            let _ = overlay_win.set_size(tauri::Size::Physical(*size));
+        }
+
+        let _ = overlay_win.set_always_on_top(true);
+        let _ = overlay_win.show();
+        let _ = overlay_win.set_focus();
+
+        let _ = overlay_win.emit(
+            "start-capture",
+            serde_json::json!({
+                "imageUrl": capture_res.image_data_url,
+                "width": capture_res.width,
+                "height": capture_res.height,
+                "scaleFactor": capture_res.scale_factor,
+            }),
+        );
+    }
+
+    Ok(capture_res)
+}
+
+#[tauri::command]
+pub fn hide_capture_overlay(app: tauri::AppHandle) -> Result<(), String> {
+    use tauri::Manager;
+    if let Some(overlay_win) = app.get_webview_window("overlay") {
+        let _ = overlay_win.hide();
+    }
+    Ok(())
+}
+
+#[tauri::command]
 pub fn register_capture_shortcut(
     accelerator: String,
 ) -> Result<ShortcutRegistrationResponse, String> {

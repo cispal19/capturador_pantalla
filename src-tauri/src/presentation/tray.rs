@@ -1,10 +1,10 @@
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{TrayIcon, TrayIconBuilder},
-    AppHandle, Emitter, Manager, Runtime,
+    AppHandle, Emitter, Manager,
 };
 
-pub fn create_tray<R: Runtime>(app: &AppHandle<R>) -> Result<TrayIcon<R>, tauri::Error> {
+pub fn create_tray(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
     let capture_i = MenuItem::with_id(
         app,
         "capture",
@@ -30,7 +30,11 @@ pub fn create_tray<R: Runtime>(app: &AppHandle<R>) -> Result<TrayIcon<R>, tauri:
         .show_menu_on_left_click(true)
         .on_menu_event(|app, event| match event.id.as_ref() {
             "capture" => {
-                let _ = app.emit("trigger-capture", ());
+                let app_handle = app.clone();
+                std::thread::spawn(move || {
+                    let _ =
+                        crate::presentation::commands::start_capture_session_flow(app_handle, None);
+                });
             }
             "toggle_window" => {
                 if let Some(window) = app.get_webview_window("main") {

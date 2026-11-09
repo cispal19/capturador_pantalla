@@ -2,11 +2,52 @@ import "./App.css";
 import { tauriBridge } from "./services/tauriBridge";
 import { SelectionOverlay } from "./components/SelectionOverlay";
 import { SettingsModal } from "./components/SettingsModal";
-import type { SelectionRect } from "./types/selection";
 import { listen } from "@tauri-apps/api/event";
 
 let activeOverlay: SelectionOverlay | null = null;
 let settingsModal: SettingsModal | null = null;
+
+async function initOverlay() {
+  document.documentElement.classList.add("overlay-mode");
+  document.body.classList.add("overlay-mode");
+  const root = document.getElementById("root");
+  if (root) root.remove();
+
+  let overlayInstance: SelectionOverlay | null = null;
+
+  try {
+    await listen<{ imageUrl?: string }>("start-capture", async (event) => {
+      if (overlayInstance) {
+        overlayInstance.destroy();
+        overlayInstance = null;
+      }
+
+      let preloadedImg: HTMLImageElement | null = null;
+      if (event.payload?.imageUrl) {
+        preloadedImg = new Image();
+        await new Promise<void>((resolve) => {
+          preloadedImg!.onload = () => resolve();
+          preloadedImg!.onerror = () => resolve();
+          preloadedImg!.src = event.payload.imageUrl!;
+        });
+      }
+
+      overlayInstance = new SelectionOverlay({
+        preloadedImage: preloadedImg,
+        backgroundImageUrl: event.payload?.imageUrl,
+      });
+      overlayInstance.mount();
+
+      overlayInstance.setOnCancel(async () => {
+        if (overlayInstance) {
+          overlayInstance.destroy();
+          overlayInstance = null;
+        }
+        await tauriBridge.hideCaptureOverlay();
+      });
+    });
+  } catch {}
+}
 
 async function startSelection() {
   // Close preferences modal if open
@@ -14,91 +55,29 @@ async function startSelection() {
     settingsModal.close();
   }
 
+  try {
+    const { getCurrentWindow } = await import("@tauri-apps/api/window");
+    if (getCurrentWindow()) {
+      await tauriBridge.startCapture();
+      return;
+    }
+  } catch {}
+
+  // Fallback for headless / non-Tauri test environments
+  const captureResult = await tauriBridge.triggerScreenCapture();
   if (activeOverlay) {
     activeOverlay.destroy();
     activeOverlay = null;
   }
-
-  // 1. Hide the window first so it is not visible in the desktop screenshot
-  try {
-    const { getCurrentWindow } = await import("@tauri-apps/api/window");
-    const win = getCurrentWindow();
-    await win.hide();
-  } catch {}
-
-  // 2. Wait 200ms for OS window server to clear the display
-  await new Promise((r) => setTimeout(r, 200));
-
-  // 3. Trigger native screen capture
-  const captureResult = await tauriBridge.triggerScreenCapture();
-
-  // 4. Preload captured desktop image in memory before painting
-  let preloadedImg: HTMLImageElement | null = null;
-  if (captureResult.image_data_url) {
-    preloadedImg = new Image();
-    await new Promise<void>((resolve) => {
-      preloadedImg!.onload = () => resolve();
-      preloadedImg!.onerror = () => resolve();
-      preloadedImg!.src = captureResult.image_data_url!;
-    });
-  }
-
-  // 5. Hide dashboard HTML elements so only canvas is rendered
-  const rootEl = document.getElementById("root");
-  if (rootEl) {
-    rootEl.style.display = "none";
-  }
-
-  // 6. Expand window to borderless overlay covering the full display
-  try {
-    const { getCurrentWindow, LogicalPosition, LogicalSize } =
-      await import("@tauri-apps/api/window");
-    const win = getCurrentWindow();
-    const targetW =
-      Math.round(captureResult.width / captureResult.scale_factor) ||
-      (typeof window !== "undefined" ? window.screen.width || 1920 : 1920);
-    const targetH =
-      Math.round(captureResult.height / captureResult.scale_factor) ||
-      (typeof window !== "undefined" ? window.screen.height || 1080 : 1080);
-    await win.setDecorations(false);
-    await win.setAlwaysOnTop(true);
-    await win.setPosition(new LogicalPosition(0, 0));
-    await win.setSize(new LogicalSize(targetW, targetH));
-    await win.show();
-    await win.setFocus();
-  } catch {}
-
-  // 7. Mount SelectionOverlay with the preloaded desktop image
   activeOverlay = new SelectionOverlay({
-    preloadedImage: preloadedImg,
     backgroundImageUrl: captureResult.image_data_url,
   });
   activeOverlay.mount();
-
-  activeOverlay.setOnSelectionComplete((box: SelectionRect) => {
-    const statusEl = document.getElementById("selection-status");
-    if (statusEl) {
-      statusEl.innerHTML = `✅ Área seleccionada: <strong>${Math.round(box.width)} × ${Math.round(box.height)} px</strong> en (${Math.round(box.x)}, ${Math.round(box.y)})`;
-    }
-  });
-
-  activeOverlay.setOnCancel(async () => {
-    if (rootEl) {
-      rootEl.style.display = "block";
-    }
+  activeOverlay.setOnCancel(() => {
     if (activeOverlay) {
       activeOverlay.destroy();
       activeOverlay = null;
     }
-    try {
-      const { getCurrentWindow, LogicalSize } = await import("@tauri-apps/api/window");
-      const win = getCurrentWindow();
-      await win.hide();
-      await win.setAlwaysOnTop(false);
-      await win.setDecorations(true);
-      await win.setSize(new LogicalSize(800, 600));
-      await win.center();
-    } catch {}
   });
 }
 
@@ -187,10 +166,6 @@ async function renderApp() {
       void settingsModal?.open();
     });
     void listen("trigger-capture", async () => {
-      try {
-        await win.show();
-        await win.setFocus();
-      } catch {}
       void startSelection();
     });
   } catch {
@@ -198,4 +173,16 @@ async function renderApp() {
   }
 }
 
-renderApp();
+async function init() {
+  try {
+    const { getCurrentWindow } = await import("@tauri-apps/api/window");
+    const win = getCurrentWindow();
+    if (win && win.label === "overlay") {
+      await initOverlay();
+      return;
+    }
+  } catch {}
+  await renderApp();
+}
+
+void init();

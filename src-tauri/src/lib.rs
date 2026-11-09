@@ -7,10 +7,11 @@ pub mod presentation;
 use presentation::commands::{
     apply_obfuscation, cancel_capture_session, cancel_screen_recording, commit_selection_region,
     copy_capture_to_clipboard, export_frames_to_gif, get_app_info, get_connected_monitors,
-    get_preferences, get_recording_status, get_session_state, normalize_bounding_box,
-    pause_screen_recording, register_capture_shortcut, reset_preferences, resume_screen_recording,
-    save_capture_to_file, start_screen_recording, stop_screen_recording, sync_annotations,
-    trigger_screen_capture, update_preferences,
+    get_preferences, get_recording_status, get_session_state, hide_capture_overlay,
+    normalize_bounding_box, pause_screen_recording, register_capture_shortcut, reset_preferences,
+    resume_screen_recording, save_capture_to_file, start_capture_session_flow,
+    start_screen_recording, stop_screen_recording, sync_annotations, trigger_screen_capture,
+    update_preferences,
 };
 use presentation::tray::create_tray;
 
@@ -22,6 +23,24 @@ pub fn run() {
             #[cfg(desktop)]
             {
                 let _tray = create_tray(app.handle())?;
+
+                use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
+                let app_handle = app.handle().clone();
+                if let Ok(shortcut) = "CommandOrControl+Shift+X".parse::<Shortcut>() {
+                    let _ = app
+                        .global_shortcut()
+                        .on_shortcut(shortcut, move |_app, _sc, event| {
+                            if event.state() == ShortcutState::Pressed {
+                                let handle = app_handle.clone();
+                                std::thread::spawn(move || {
+                                    let _ =
+                                        crate::presentation::commands::start_capture_session_flow(
+                                            handle, None,
+                                        );
+                                });
+                            }
+                        });
+                }
             }
             Ok(())
         })
@@ -47,7 +66,9 @@ pub fn run() {
             stop_screen_recording,
             cancel_screen_recording,
             get_recording_status,
-            export_frames_to_gif
+            export_frames_to_gif,
+            start_capture_session_flow,
+            hide_capture_overlay
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

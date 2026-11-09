@@ -1,3 +1,15 @@
+html.overlay-mode,
+body.overlay-mode {
+  background: transparent !important;
+  background-color: transparent !important;
+  overflow: hidden !important;
+  width: 100vw;
+  height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;

@@ -654,6 +654,7 @@ export class SelectionOverlay {
 
   private async hideWindowIfDesktop() {
     try {
+      await tauriBridge.hideCaptureOverlay();
       const { getCurrentWindow } = await import("@tauri-apps/api/window");
       await getCurrentWindow().hide();
     } catch {}

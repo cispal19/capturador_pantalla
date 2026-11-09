@@ -10,6 +10,7 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "Capturador de Pantalla",
@@ -22,6 +23,17 @@
         "transparent": false,
         "decorations": true,
         "alwaysOnTop": false
+      },
+      {
+        "title": "Overlay",
+        "label": "overlay",
+        "fullscreen": false,
+        "maximized": false,
+        "visible": false,
+        "transparent": true,
+        "decorations": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true
       }
     ],
     "security": {
