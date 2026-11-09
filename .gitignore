@@ -1,0 +1,8 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Spec Kit local state
+.specify/feature.json
+.specify/integrations/packages/
+.specify/integrations/packages.json
