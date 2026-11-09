@@ -12,6 +12,7 @@ El proyecto se desarrolla bajo la metodología **Spec-Driven Development (SDD)**
 2. **[Documento de Requisitos de Negocio (BRD)](docs/BRD.md)**: Justificación de negocio, problemática en entornos corporativos remotos, partes interesadas, reglas de negocio (BR-001 a BR-007) y alcance del proyecto (Fase 1: Imágenes, Fase 2: Video/GIF).
 3. **[Documento de Requisitos de Producto (PRD)](docs/PRD.md)**: Personas de usuario, épicas, historias de usuario, requisitos funcionales (FR-001 a FR-020), no funcionales (NFR-001 a NFR-007) y especificaciones UX/UI de interacción rápida.
 4. **[Documento de Requisitos Técnicos y Arquitectura (TRD / ARD)](docs/TRD.md)**: Selección tecnológica (Tauri 2.0 + Rust + TypeScript), descomposición en capas de Clean Architecture (Dominio, Casos de Uso, Puertos, Adaptadores, Presentación), matriz de trazabilidad y estrategia TDD.
+5. **[Guía de Prompts SDD (Spec Kit Roadmap)](docs/SDD_PROMPTS_ROADMAP.md)**: Catálogo ordenado de prompts para ejecutar `/speckit-specify` y `/speckit-plan` en cada una de las 8 features del roadmap.
 
 ---
 
