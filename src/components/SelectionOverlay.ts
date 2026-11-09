@@ -16,6 +16,7 @@ import {
 } from "../domain/geometry";
 import { UndoRedoStack, createAnnotation } from "../domain/annotations";
 import { AnnotationToolbar } from "./AnnotationToolbar";
+import { RecordingToolbar } from "./RecordingToolbar";
 import { showToast } from "./Toast";
 import { tauriBridge } from "../services/tauriBridge";
 
@@ -28,6 +29,8 @@ export class SelectionOverlay {
   private container: HTMLElement | null = null;
   private animationFrameId: number | null = null;
   private toolbar: AnnotationToolbar;
+  private recordingToolbar: RecordingToolbar;
+  private isRecording = false;
   private history = new UndoRedoStack<AnnotationItem>();
   private activeDrawing: AnnotationItem | null = null;
   private drawingPoints: Array<[number, number]> = [];
@@ -51,6 +54,7 @@ export class SelectionOverlay {
     this.canvas.style.pointerEvents = "auto";
 
     this.toolbar = new AnnotationToolbar();
+    this.recordingToolbar = new RecordingToolbar();
 
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -64,12 +68,18 @@ export class SelectionOverlay {
     this.toolbar.setOnToolChange(() => this.updateCursor());
     this.toolbar.setOnCopy(() => void this.exportToClipboard());
     this.toolbar.setOnSave(() => void this.exportToFile());
+    this.toolbar.setOnRecord(() => void this.startRecording());
+
+    this.recordingToolbar.setOnPauseResume((isPaused) => void this.togglePauseRecording(isPaused));
+    this.recordingToolbar.setOnStop(() => void this.stopRecording());
+    this.recordingToolbar.setOnCancel(() => void this.cancelRecording());
   }
 
   mount(container: HTMLElement = document.body) {
     this.container = container;
     this.container.appendChild(this.canvas);
     this.toolbar.mount(container);
+    this.recordingToolbar.mount(container);
     this.ctx = this.canvas.getContext("2d");
 
     this.updateCanvasDimensions();
@@ -91,6 +101,7 @@ export class SelectionOverlay {
     }
 
     this.toolbar.destroy();
+    this.recordingToolbar.destroy();
 
     this.canvas.removeEventListener("mousedown", this.handleMouseDown);
     this.canvas.removeEventListener("mousemove", this.handleMouseMove);
@@ -180,7 +191,88 @@ export class SelectionOverlay {
     }
   }
 
+  getRecordingToolbar(): RecordingToolbar {
+    return this.recordingToolbar;
+  }
+
+  isRecordingActive(): boolean {
+    return this.isRecording;
+  }
+
+  async startRecording(): Promise<boolean> {
+    if (!this.activeBox) return false;
+    const { x, y, width, height } = this.activeBox;
+    if (width < 50 || height < 50) {
+      showToast("⚠️ Dimensiones mínimas para grabar: 50x50 px");
+      return false;
+    }
+
+    try {
+      await tauriBridge.startScreenRecording(x, y, width, height, 30, 600);
+      this.isRecording = true;
+      this.toolbar.hide();
+      this.recordingToolbar.show();
+      this.recordingToolbar.startTimer();
+      this.recordingToolbar.updatePosition(
+        this.activeBox,
+        typeof window !== "undefined" ? window.innerWidth || 800 : 800,
+        typeof window !== "undefined" ? window.innerHeight || 600 : 600
+      );
+      this.requestRender();
+      showToast("🎥 Grabación iniciada");
+      return true;
+    } catch {
+      showToast("⚠️ Error al iniciar grabación");
+      return false;
+    }
+  }
+
+  async togglePauseRecording(isPaused: boolean): Promise<void> {
+    try {
+      if (isPaused) {
+        await tauriBridge.pauseScreenRecording();
+      } else {
+        await tauriBridge.resumeScreenRecording();
+      }
+      this.requestRender();
+    } catch {}
+  }
+
+  async stopRecording(): Promise<boolean> {
+    try {
+      const elapsed = this.recordingToolbar.getElapsedSeconds();
+      const res = await tauriBridge.stopScreenRecording(
+        new Uint8Array([0x1a, 0x45, 0xdf, 0xa3]),
+        elapsed,
+        "webm"
+      );
+      showToast(`💾 Grabación guardada en ${res.filePath}`);
+      this.isRecording = false;
+      this.recordingToolbar.hide();
+      this.cancel();
+      return true;
+    } catch {
+      showToast("⚠️ Error al detener grabación");
+      return false;
+    }
+  }
+
+  async cancelRecording(): Promise<void> {
+    try {
+      await tauriBridge.cancelScreenRecording();
+    } catch {}
+    this.isRecording = false;
+    this.recordingToolbar.hide();
+    this.cancel();
+  }
+
   cancel() {
+    if (this.isRecording) {
+      void tauriBridge.cancelScreenRecording();
+      this.isRecording = false;
+    }
+    this.recordingToolbar.hide();
+
     this.activeBox = null;
     this.state = { mode: "idle" };
     this.toolbar.hide();
@@ -575,9 +667,15 @@ export class SelectionOverlay {
       this.ctx.restore();
 
       // 4. Draw bounding box border
-      this.ctx.strokeStyle = this.config.borderColor;
-      this.ctx.lineWidth = this.config.borderWidth;
+      this.ctx.strokeStyle = this.isRecording ? "#ef4444" : this.config.borderColor;
+      this.ctx.lineWidth = this.isRecording ? 3 : this.config.borderWidth;
+      if (this.isRecording) {
+        this.ctx.setLineDash([8, 4]);
+      }
       this.ctx.strokeRect(x, y, bw, bh);
+      if (this.isRecording) {
+        this.ctx.setLineDash([]);
+      }
 
       // 5. Draw 8 resize handles
       const anchors = getHandleAnchors(this.activeBox);

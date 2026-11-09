@@ -127,6 +127,24 @@ La aplicación proporciona un panel de configuración completo y accesible:
 
 ---
 
+## 🎥 Motor de Grabación de Video en Región de Pantalla (Fase 2)
+
+La herramienta amplía sus capacidades incorporando grabación de video continuo en pantalla:
+- **Modo Dual Imagen / Video**:
+  - Selección de región interactiva con botón "🎥 Grabar" para iniciar captura de video.
+  - Ajuste y alineación automática de dimensiones a múltiplos pares (`width & !1`, `height & !1`) para compatibilidad universal con códecs de video (VP8/VP9/H.264).
+- **Barra de Control Flotante Inteligente**:
+  - Temporizador de grabación en vivo en formato `MM:SS`.
+  - Botones de control: Pausar/Reanudar (`⏸️` / `▶️`), Detener (`⏹️`) y Cancelar (`✕`).
+- **Delimitador Visual Activo**:
+  - Borde punteado de alta visibilidad rojo pulsante mientras se graba activamente, que conmuta a color ámbar cuando la grabación entra en pausa.
+- **Exportación Local Inmediata**:
+  - Generación de contenedor WebM estándar reproducible de forma nativa en navegadores, Slack, Teams y reproductores locales.
+  - Nomenclatura automática: `Grabacion_YYYY-MM-DD_HH-mm-ss.webm`.
+  - Cumplimiento 100% Local-First: cero telemetría y cero envíos a la nube.
+
+---
+
 ### Pruebas Automatizadas (TDD)
 ```bash
 # Ejecutar pruebas unitarias de frontend

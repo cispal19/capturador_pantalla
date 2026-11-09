@@ -12,6 +12,16 @@ impl FileNameGenerator {
         )
     }
 
+    /// Formats a recording filename with standard prefix and timestamp: `Grabacion_YYYY-MM-DD_HH-mm-ss.{ext}`
+    pub fn generate_recording_name(ext: &str, timestamp_secs: u64) -> String {
+        let (year, month, day, hour, min, sec) = Self::timestamp_to_datetime(timestamp_secs);
+        let clean_ext = ext.trim_start_matches('.');
+        format!(
+            "Grabacion_{:04}-{:02}-{:02}_{:02}-{:02}-{:02}.{}",
+            year, month, day, hour, min, sec, clean_ext
+        )
+    }
+
     /// Pure mathematical decomposition of seconds since Unix Epoch (1970-01-01 00:00:00 UTC)
     fn timestamp_to_datetime(secs: u64) -> (u32, u32, u32, u32, u32, u32) {
         let sec = (secs % 60) as u32;
@@ -84,5 +94,12 @@ pub mod tests {
     fn test_file_name_generator_epoch() {
         let name = FileNameGenerator::generate_name("webp", 0);
         assert_eq!(name, "Captura_1970-01-01_00-00-00.webp");
+    }
+
+    #[test]
+    fn test_file_name_generator_recording() {
+        let ts = 1794225600;
+        let name = FileNameGenerator::generate_recording_name("webm", ts);
+        assert_eq!(name, "Grabacion_2026-11-09_12-00-00.webm");
     }
 }

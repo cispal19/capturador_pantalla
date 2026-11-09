@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { type AppPreferences, DEFAULT_PREFERENCES } from "../types/preferences";
+import type { RecordingMetadata, RecordingRegion, RecordingState } from "../types/recording";
 import type {
   AppInfo,
   BoundingBox,
@@ -243,6 +244,102 @@ export class TauriBridgeService {
       return await invoke<AppPreferences>("reset_preferences");
     } catch {
       return { ...DEFAULT_PREFERENCES };
+    }
+  }
+
+  async startScreenRecording(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    fps = 30,
+    timeLimitSeconds = 600
+  ): Promise<RecordingRegion> {
+    try {
+      return await invoke<RecordingRegion>("start_screen_recording", {
+        x: Math.round(x),
+        y: Math.round(y),
+        width: Math.round(width),
+        height: Math.round(height),
+        fps,
+        timeLimitSeconds,
+      });
+    } catch {
+      return {
+        x: Math.round(x),
+        y: Math.round(y),
+        width: Math.round(width) & ~1,
+        height: Math.round(height) & ~1,
+        fps,
+        timeLimitSeconds,
+      };
+    }
+  }
+
+  async pauseScreenRecording(): Promise<boolean> {
+    try {
+      return await invoke<boolean>("pause_screen_recording");
+    } catch {
+      return true;
+    }
+  }
+
+  async resumeScreenRecording(): Promise<boolean> {
+    try {
+      return await invoke<boolean>("resume_screen_recording");
+    } catch {
+      return true;
+    }
+  }
+
+  async stopScreenRecording(
+    videoData: Uint8Array | number[],
+    durationSeconds: number,
+    format = "webm"
+  ): Promise<RecordingMetadata> {
+    try {
+      const data = Array.isArray(videoData) ? videoData : Array.from(videoData);
+      return await invoke<RecordingMetadata>("stop_screen_recording", {
+        videoData: data,
+        durationSeconds: Math.round(durationSeconds),
+        format,
+      });
+    } catch {
+      return {
+        filePath: `/Users/mock/Pictures/Grabacion_mock.${format}`,
+        durationSeconds: Math.round(durationSeconds),
+        fileSizeBytes: videoData.length,
+        format,
+        fps: 30,
+      };
+    }
+  }
+
+  async cancelScreenRecording(): Promise<boolean> {
+    try {
+      return await invoke<boolean>("cancel_screen_recording");
+    } catch {
+      return true;
+    }
+  }
+
+  async getRecordingStatus(): Promise<{
+    state: RecordingState;
+    elapsed_seconds: number;
+    region: RecordingRegion | null;
+  }> {
+    try {
+      return await invoke<{
+        state: RecordingState;
+        elapsed_seconds: number;
+        region: RecordingRegion | null;
+      }>("get_recording_status");
+    } catch {
+      return {
+        state: "Idle",
+        elapsed_seconds: 0,
+        region: null,
+      };
     }
   }
 }

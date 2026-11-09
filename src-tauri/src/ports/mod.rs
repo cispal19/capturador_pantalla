@@ -1,4 +1,8 @@
-use crate::domain::{buffer::RawDisplayBuffer, display::DisplayInfo};
+use crate::domain::{
+    buffer::RawDisplayBuffer,
+    display::DisplayInfo,
+    recording::{RecordingMetadata, RecordingRegion, RecordingState},
+};
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, thiserror::Error, Clone, PartialEq)]
@@ -108,4 +112,41 @@ pub trait IGlobalShortcutDriver: Send + Sync {
         let _ = accelerator;
         self.unregister_all()
     }
+}
+
+#[derive(Debug, thiserror::Error, Clone, PartialEq)]
+pub enum RecorderDriverError {
+    #[error("No active recording session")]
+    NoActiveSession,
+    #[error("Recording already in progress")]
+    AlreadyRecording,
+    #[error("Invalid state transition from {0:?}")]
+    InvalidState(RecordingState),
+    #[error("Encoding or IO error: {0}")]
+    EncodingError(String),
+}
+
+pub trait IScreenRecorderDriver: Send + Sync {
+    /// Start recording the given region
+    fn start(&self, region: &RecordingRegion) -> Result<(), RecorderDriverError>;
+
+    /// Pause the active recording
+    fn pause(&self) -> Result<(), RecorderDriverError>;
+
+    /// Resume the paused recording
+    fn resume(&self) -> Result<(), RecorderDriverError>;
+
+    /// Stop recording and finalize video output
+    fn stop(
+        &self,
+        video_bytes: &[u8],
+        duration_seconds: u32,
+        format: &str,
+    ) -> Result<RecordingMetadata, RecorderDriverError>;
+
+    /// Cancel and discard the current recording
+    fn cancel(&self) -> Result<(), RecorderDriverError>;
+
+    /// Get current state
+    fn state(&self) -> RecordingState;
 }

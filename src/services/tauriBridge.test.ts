@@ -106,4 +106,26 @@ describe("TauriBridgeService", () => {
     expect(reset.default_image_format).toBe("png");
     expect(reset.autostart_enabled).toBe(false);
   });
+
+  it("handles screen recording lifecycle via tauriBridge (Feature 007)", async () => {
+    const region = await tauriBridge.startScreenRecording(100, 100, 401, 301, 30, 300);
+    expect(region.width).toBe(400); // Aligned to even
+    expect(region.height).toBe(300);
+
+    const paused = await tauriBridge.pauseScreenRecording();
+    expect(paused).toBe(true);
+
+    const resumed = await tauriBridge.resumeScreenRecording();
+    expect(resumed).toBe(true);
+
+    const meta = await tauriBridge.stopScreenRecording(new Uint8Array([1, 2, 3, 4]), 5, "webm");
+    expect(meta.durationSeconds).toBe(5);
+    expect(meta.format).toBe("webm");
+
+    const cancelled = await tauriBridge.cancelScreenRecording();
+    expect(cancelled).toBe(true);
+
+    const status = await tauriBridge.getRecordingStatus();
+    expect(status.state).toBeDefined();
+  });
 });

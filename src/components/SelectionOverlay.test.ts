@@ -252,4 +252,40 @@ describe("SelectionOverlay Component", () => {
     saveBtn.click();
     expect(exportFileSpy).toHaveBeenCalledOnce();
   });
+
+  it("initiates and controls screen recording from toolbar (Feature 007)", async () => {
+    const canvas = container.querySelector("canvas")!;
+
+    // Create selection (100, 100, 300, 200)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 400, clientY: 300 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 400, clientY: 300 }));
+
+    expect(overlay.getActiveBox()).not.toBeNull();
+
+    const recordSpy = vi.spyOn(overlay, "startRecording");
+    const toolbarEl = overlay.getToolbar().getElement();
+    const recordBtn = toolbarEl.querySelector('[data-action="record"]') as HTMLButtonElement;
+
+    expect(recordBtn).not.toBeNull();
+    recordBtn.click();
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(recordSpy).toHaveBeenCalledOnce();
+    expect(overlay.isRecordingActive()).toBe(true);
+
+    const recordingToolbar = overlay.getRecordingToolbar();
+    expect(recordingToolbar.getElement().style.display).not.toBe("none");
+
+    // Stop recording
+    const stopSpy = vi.spyOn(overlay, "stopRecording");
+    const stopBtn = recordingToolbar
+      .getElement()
+      .querySelector('[data-action="stop"]') as HTMLButtonElement;
+    stopBtn.click();
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(stopSpy).toHaveBeenCalledOnce();
+    expect(overlay.isRecordingActive()).toBe(false);
+  });
 });

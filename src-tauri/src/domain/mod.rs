@@ -9,6 +9,7 @@ pub mod handle;
 pub mod naming;
 pub mod obfuscation;
 pub mod preferences;
+pub mod recording;
 
 pub use annotation::{Annotation, AnnotationTool, UndoRedoHistory};
 pub use bounding_box::BoundingBox;
@@ -21,3 +22,4 @@ pub use handle::{HandleAnchor, ResizeHandle};
 pub use naming::FileNameGenerator;
 pub use obfuscation::{ObfuscationKernel, ObfuscationRegion};
 pub use preferences::AppPreferences;
+pub use recording::{RecordingMetadata, RecordingRegion, RecordingState};

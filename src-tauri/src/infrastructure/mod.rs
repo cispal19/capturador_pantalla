@@ -1,6 +1,7 @@
 pub mod clipboard;
 pub mod config_store;
 pub mod mock_capture;
+pub mod mock_recorder;
 pub mod mock_shortcut;
 pub mod permissions;
 pub mod storage;
@@ -10,6 +11,7 @@ pub mod xcap_capture;
 pub use clipboard::{ArboardClipboardDriver, MockClipboardDriver};
 pub use config_store::JsonConfigStoreDriver;
 pub use mock_capture::MockScreenCaptureDriver;
+pub use mock_recorder::MockScreenRecorderDriver;
 pub use mock_shortcut::MockShortcutDriver;
 pub use permissions::SystemPermissionsService;
 pub use storage::FileSystemStorageDriver;

@@ -18,6 +18,7 @@ export class AnnotationToolbar {
   private onRedoCallback?: () => void;
   private onCopyCallback?: () => void;
   private onSaveCallback?: () => void;
+  private onRecordCallback?: () => void;
 
   constructor() {
     this.element = document.createElement("div");
@@ -90,6 +91,10 @@ export class AnnotationToolbar {
 
   setOnSave(cb: () => void) {
     this.onSaveCallback = cb;
+  }
+
+  setOnRecord(cb: () => void) {
+    this.onRecordCallback = cb;
   }
 
   show() {
@@ -204,6 +209,19 @@ export class AnnotationToolbar {
           align-items: center;
           gap: 4px;
         ">💾 Guardar</button>
+        <button type="button" data-action="record" title="Grabar video de la región seleccionada" style="
+          background: #dc2626;
+          color: #ffffff;
+          border: none;
+          border-radius: 6px;
+          padding: 4px 10px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        ">🎥 Grabar</button>
       </div>
     `;
 
@@ -300,6 +318,13 @@ export class AnnotationToolbar {
     if (saveBtn) {
       saveBtn.addEventListener("click", () => {
         if (this.onSaveCallback) this.onSaveCallback();
+      });
+    }
+
+    const recordBtn = this.element.querySelector('[data-action="record"]');
+    if (recordBtn) {
+      recordBtn.addEventListener("click", () => {
+        if (this.onRecordCallback) this.onRecordCallback();
       });
     }
   }

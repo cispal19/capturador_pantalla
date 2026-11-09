@@ -23,7 +23,7 @@ description: "Task list for feature 007-screen-recording-engine"
 
 **Purpose**: Shared interfaces and frontend/backend types for screen recording
 
-- [ ] T001 Define TypeScript `RecordingState`, `RecordingRegion`, and `RecordingMetadata` in `src/types/recording.ts`
+- [x] T001 Define TypeScript `RecordingState`, `RecordingRegion`, and `RecordingMetadata` in `src/types/recording.ts`
 
 ---
 
@@ -33,11 +33,11 @@ description: "Task list for feature 007-screen-recording-engine"
 
 **⚠️ CRITICAL**: Must write tests first and ensure they fail before implementing.
 
-- [ ] T002 [P] Write unit tests for `RecordingRegion` and `RecordingState` in `src-tauri/src/domain/recording.rs`
-- [ ] T003 Implement `RecordingRegion` and `RecordingState` in `src-tauri/src/domain/recording.rs` and export in `src-tauri/src/domain/mod.rs`
-- [ ] T004 [P] Define `IScreenRecorderDriver` trait in `src-tauri/src/ports/mod.rs`
-- [ ] T005 [P] Write unit tests for `MockScreenRecorderDriver` in `src-tauri/src/infrastructure/mock_recorder.rs`
-- [ ] T006 Implement `MockScreenRecorderDriver` in `src-tauri/src/infrastructure/mock_recorder.rs` and export in `src-tauri/src/infrastructure/mod.rs`
+- [x] T002 [P] Write unit tests for `RecordingRegion` and `RecordingState` in `src-tauri/src/domain/recording.rs`
+- [x] T003 Implement `RecordingRegion` and `RecordingState` in `src-tauri/src/domain/recording.rs` and export in `src-tauri/src/domain/mod.rs`
+- [x] T004 [P] Define `IScreenRecorderDriver` trait in `src-tauri/src/ports/mod.rs`
+- [x] T005 [P] Write unit tests for `MockScreenRecorderDriver` in `src-tauri/src/infrastructure/mock_recorder.rs`
+- [x] T006 Implement `MockScreenRecorderDriver` in `src-tauri/src/infrastructure/mock_recorder.rs` and export in `src-tauri/src/infrastructure/mod.rs`
 
 **Checkpoint**: Foundational models and driver abstraction tested and ready.
 
@@ -52,14 +52,14 @@ description: "Task list for feature 007-screen-recording-engine"
 ### Tests for User Story 1 ⚠️
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T007 [P] [US1] Write unit tests for `RecordingSessionManager` in `src-tauri/src/application/recording.rs`
-- [ ] T008 [P] [US1] Write unit tests for recording IPC commands in `src-tauri/src/presentation/commands.rs`
+- [x] T007 [P] [US1] Write unit tests for `RecordingSessionManager` in `src-tauri/src/application/recording.rs`
+- [x] T008 [P] [US1] Write unit tests for recording IPC commands in `src-tauri/src/presentation/commands.rs`
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Implement `RecordingSessionManager` in `src-tauri/src/application/recording.rs` and export in `src-tauri/src/application/mod.rs`
-- [ ] T010 [US1] Implement recording IPC commands in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
-- [ ] T011 [US1] Implement recording bridge methods in `src/services/tauriBridge.ts` with tests in `src/services/tauriBridge.test.ts`
+- [x] T009 [US1] Implement `RecordingSessionManager` in `src-tauri/src/application/recording.rs` and export in `src-tauri/src/application/mod.rs`
+- [x] T010 [US1] Implement recording IPC commands in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
+- [x] T011 [US1] Implement recording bridge methods in `src/services/tauriBridge.ts` with tests in `src/services/tauriBridge.test.ts`
 
 **Checkpoint**: User Story 1 is functional: recording session lifecycle works end-to-end via IPC.
 
@@ -73,12 +73,12 @@ description: "Task list for feature 007-screen-recording-engine"
 
 ### Tests for User Stories 2 & 3 ⚠️
 
-- [ ] T012 [P] [US2] Write unit tests for `RecordingToolbar` in `src/components/RecordingToolbar.test.ts`
+- [x] T012 [P] [US2] Write unit tests for `RecordingToolbar` in `src/components/RecordingToolbar.test.ts`
 
 ### Implementation for User Stories 2 & 3
 
-- [ ] T013 [US2] Implement `RecordingToolbar` component in `src/components/RecordingToolbar.ts`
-- [ ] T014 [US2] Connect recording mode toggle and `RecordingToolbar` in `src/components/SelectionOverlay.ts`
+- [x] T013 [US2] Implement `RecordingToolbar` component in `src/components/RecordingToolbar.ts`
+- [x] T014 [US2] Connect recording mode toggle and `RecordingToolbar` in `src/components/SelectionOverlay.ts`
 
 **Checkpoint**: Full graphical and interactive recording experience.
 
@@ -88,6 +88,6 @@ description: "Task list for feature 007-screen-recording-engine"
 
 **Purpose**: Documentation, quickstart validation, and quality gates
 
-- [ ] T015 [P] Update `README.md` with screen recording instructions and features
-- [ ] T016 Execute quickstart verification (`specs/007-screen-recording-engine/quickstart.md`)
-- [ ] T017 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)
+- [x] T015 [P] Update `README.md` with screen recording instructions and features
+- [x] T016 Execute quickstart verification (`specs/007-screen-recording-engine/quickstart.md`)
+- [x] T017 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)

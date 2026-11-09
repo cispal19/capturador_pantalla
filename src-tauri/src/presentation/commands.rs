@@ -1,3 +1,4 @@
+use crate::application::{RecordingSessionManager, RecordingStatusResponse};
 use crate::domain::{
     annotation::Annotation,
     bounding_box::BoundingBox,
@@ -8,13 +9,20 @@ use crate::domain::{
     error::DomainError,
     naming::FileNameGenerator,
     preferences::AppPreferences,
+    recording::{RecordingMetadata, RecordingRegion},
 };
 use crate::infrastructure::{
     ArboardClipboardDriver, FileSystemStorageDriver, JsonConfigStoreDriver, MockClipboardDriver,
-    MockScreenCaptureDriver, XcapScreenCaptureDriver,
+    MockScreenCaptureDriver, MockScreenRecorderDriver, XcapScreenCaptureDriver,
 };
 use crate::ports::{IClipboardDriver, IFileSystemDriver, IScreenCaptureDriver, ImageFileFormat};
 use serde::{Deserialize, Serialize};
+use std::sync::{LazyLock, Mutex};
+
+static RECORDING_MANAGER: LazyLock<Mutex<RecordingSessionManager>> = LazyLock::new(|| {
+    let driver = std::sync::Arc::new(MockScreenRecorderDriver::new(None));
+    Mutex::new(RecordingSessionManager::new(driver))
+});
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AppInfoResponse {
@@ -194,6 +202,7 @@ pub fn commit_selection_region(
 #[cfg(test)]
 pub mod tests {
     use super::*;
+    use crate::domain::recording::RecordingState;
 
     #[test]
     fn test_cancel_capture_session_returns_idle() {
@@ -266,6 +275,47 @@ pub mod tests {
 
         let reset = reset_preferences().unwrap();
         assert_eq!(reset.default_image_format, "png");
+    }
+
+    #[test]
+    fn test_recording_commands_lifecycle() {
+        let region = start_screen_recording(100, 100, 400, 300, Some(30), Some(600)).unwrap();
+        assert_eq!(region.width, 400);
+
+        let status = get_recording_status().unwrap();
+        assert_eq!(status.state, RecordingState::Recording);
+
+        assert!(pause_screen_recording().unwrap());
+        assert_eq!(
+            get_recording_status().unwrap().state,
+            RecordingState::Paused
+        );
+
+        assert!(resume_screen_recording().unwrap());
+        assert_eq!(
+            get_recording_status().unwrap().state,
+            RecordingState::Recording
+        );
+
+        let fake_video = vec![0x1a, 0x45, 0xdf, 0xa3];
+        let meta = stop_screen_recording(fake_video, 5, Some("webm".to_string())).unwrap();
+        assert_eq!(meta.duration_seconds, 5);
+        assert!(std::path::Path::new(&meta.file_path).exists());
+        let _ = std::fs::remove_file(meta.file_path);
+
+        assert_eq!(get_recording_status().unwrap().state, RecordingState::Idle);
+    }
+
+    #[test]
+    fn test_recording_commands_cancel() {
+        start_screen_recording(50, 50, 200, 200, None, None).unwrap();
+        assert_eq!(
+            get_recording_status().unwrap().state,
+            RecordingState::Recording
+        );
+
+        assert!(cancel_screen_recording().unwrap());
+        assert_eq!(get_recording_status().unwrap().state, RecordingState::Idle);
     }
 }
 
@@ -417,4 +467,63 @@ pub fn reset_preferences() -> Result<AppPreferences, String> {
     let store = JsonConfigStoreDriver::default();
     store.save(&defaults)?;
     Ok(defaults)
+}
+
+#[tauri::command]
+pub fn start_screen_recording(
+    x: u32,
+    y: u32,
+    width: u32,
+    height: u32,
+    fps: Option<u32>,
+    time_limit_seconds: Option<u32>,
+) -> Result<RecordingRegion, String> {
+    let region = RecordingRegion::new(
+        x,
+        y,
+        width,
+        height,
+        fps.unwrap_or(30),
+        time_limit_seconds.unwrap_or(600),
+    )?;
+    let mgr = RECORDING_MANAGER.lock().unwrap();
+    mgr.start_recording(region)
+}
+
+#[tauri::command]
+pub fn pause_screen_recording() -> Result<bool, String> {
+    let mgr = RECORDING_MANAGER.lock().unwrap();
+    mgr.pause_recording()?;
+    Ok(true)
+}
+
+#[tauri::command]
+pub fn resume_screen_recording() -> Result<bool, String> {
+    let mgr = RECORDING_MANAGER.lock().unwrap();
+    mgr.resume_recording()?;
+    Ok(true)
+}
+
+#[tauri::command]
+pub fn stop_screen_recording(
+    video_data: Vec<u8>,
+    duration_seconds: u32,
+    format: Option<String>,
+) -> Result<RecordingMetadata, String> {
+    let fmt = format.unwrap_or_else(|| "webm".to_string());
+    let mgr = RECORDING_MANAGER.lock().unwrap();
+    mgr.stop_recording(&video_data, duration_seconds, &fmt)
+}
+
+#[tauri::command]
+pub fn cancel_screen_recording() -> Result<bool, String> {
+    let mgr = RECORDING_MANAGER.lock().unwrap();
+    mgr.cancel_recording()?;
+    Ok(true)
+}
+
+#[tauri::command]
+pub fn get_recording_status() -> Result<RecordingStatusResponse, String> {
+    let mgr = RECORDING_MANAGER.lock().unwrap();
+    Ok(mgr.get_status())
 }
