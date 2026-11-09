@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { UndoRedoStack, createAnnotation } from "./annotations";
-import type { AnnotationItem } from "../types/annotations";
 
 describe("UndoRedoStack (Frontend)", () => {
   it("initializes empty and correctly manages push, undo and redo", () => {

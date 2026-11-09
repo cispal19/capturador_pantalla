@@ -557,7 +557,7 @@ export class SelectionOverlay {
     }
   }
 
-  private handleMouseUp(e: MouseEvent) {
+  private handleMouseUp(_e: MouseEvent) {
     if (this.isDrawingAnnotation && this.activeDrawing) {
       this.history.push(this.activeDrawing);
       void tauriBridge.syncAnnotations(this.history.getItems());

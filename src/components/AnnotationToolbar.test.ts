@@ -1,7 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { AnnotationToolbar } from "./AnnotationToolbar";
-import type { ActiveTool, CorporateColor, StrokeThickness } from "../types/annotations";
 
 describe("AnnotationToolbar Component", () => {
   let container: HTMLElement;

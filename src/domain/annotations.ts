@@ -1,5 +1,14 @@
 import type { AnnotationItem } from "../types/annotations";
 
+export type RectangleAnnotation = Extract<AnnotationItem, { type: "rectangle" }>;
+export type EllipseAnnotation = Extract<AnnotationItem, { type: "ellipse" }>;
+export type ArrowAnnotation = Extract<AnnotationItem, { type: "arrow" }>;
+export type LineAnnotation = Extract<AnnotationItem, { type: "line" }>;
+export type FreehandAnnotation = Extract<AnnotationItem, { type: "freehand" }>;
+export type TextAnnotation = Extract<AnnotationItem, { type: "text" }>;
+export type HighlighterAnnotation = Extract<AnnotationItem, { type: "highlighter" }>;
+export type ObfuscationAnnotation = Extract<AnnotationItem, { type: "obfuscation" }>;
+
 export class UndoRedoStack<T> {
   private undoStack: T[] = [];
   private redoStack: T[] = [];
@@ -57,7 +66,7 @@ export const createAnnotation = {
     height: number,
     color: string,
     stroke_width: number
-  ): AnnotationItem {
+  ): RectangleAnnotation {
     return {
       type: "rectangle",
       id: nextId(),
@@ -77,7 +86,7 @@ export const createAnnotation = {
     radius_y: number,
     color: string,
     stroke_width: number
-  ): AnnotationItem {
+  ): EllipseAnnotation {
     return {
       type: "ellipse",
       id: nextId(),
@@ -97,7 +106,7 @@ export const createAnnotation = {
     end_y: number,
     color: string,
     stroke_width: number
-  ): AnnotationItem {
+  ): ArrowAnnotation {
     return {
       type: "arrow",
       id: nextId(),
@@ -117,7 +126,7 @@ export const createAnnotation = {
     end_y: number,
     color: string,
     stroke_width: number
-  ): AnnotationItem {
+  ): LineAnnotation {
     return {
       type: "line",
       id: nextId(),
@@ -130,7 +139,11 @@ export const createAnnotation = {
     };
   },
 
-  freehand(points: Array<[number, number]>, color: string, stroke_width: number): AnnotationItem {
+  freehand(
+    points: Array<[number, number]>,
+    color: string,
+    stroke_width: number
+  ): FreehandAnnotation {
     return {
       type: "freehand",
       id: nextId(),
@@ -140,7 +153,7 @@ export const createAnnotation = {
     };
   },
 
-  text(x: number, y: number, content: string, font_size: number, color: string): AnnotationItem {
+  text(x: number, y: number, content: string, font_size: number, color: string): TextAnnotation {
     return {
       type: "text",
       id: nextId(),
@@ -156,7 +169,7 @@ export const createAnnotation = {
     points: Array<[number, number]>,
     color: string,
     stroke_width: number
-  ): AnnotationItem {
+  ): HighlighterAnnotation {
     return {
       type: "highlighter",
       id: nextId(),
@@ -172,7 +185,7 @@ export const createAnnotation = {
     width: number,
     height: number,
     block_size = 12
-  ): AnnotationItem {
+  ): ObfuscationAnnotation {
     return {
       type: "obfuscation",
       id: nextId(),
