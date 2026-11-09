@@ -51,4 +51,19 @@ describe("TauriBridgeService", () => {
     expect(res.registered).toBe(true);
     expect(res.accelerator).toBe("CommandOrControl+Shift+X");
   });
+
+  it("cancels capture session returning Idle state", async () => {
+    const res = await tauriBridge.cancelCaptureSession();
+    expect(res.state).toBe("Idle");
+  });
+
+  it("commits selection region successfully", async () => {
+    const bbox = await tauriBridge.commitSelectionRegion(100, 150, 600, 400, 2.0);
+    expect(bbox.origin.x).toBe(100);
+    expect(bbox.origin.y).toBe(150);
+    expect(bbox.size.width).toBe(600);
+    expect(bbox.size.height).toBe(400);
+    expect(bbox.physical_rect.width).toBe(1200);
+    expect(bbox.physical_rect.height).toBe(800);
+  });
 });

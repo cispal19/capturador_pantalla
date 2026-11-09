@@ -62,6 +62,18 @@ La aplicación reside discretamente en segundo plano y responde a atajos globale
 
 ---
 
+## 🎯 Overlay Interactivo de Selección (Canvas 2D @ 60 FPS)
+
+Al dispararse la captura, se proyecta un overlay transparente acelerado por hardware:
+- **Oscurecimiento Visual**: Atenuación semitransparente al 40% con recorte instantáneo del área seleccionada.
+- **Normalización Automática**: Permite arrastrar en cualquier dirección cardinal (incluyendo arrastre invertido de derecha a izquierda o de abajo hacia arriba).
+- **8 Manijas de Redimensionamiento**: Ajuste milimétrico desde esquinas (`NW`, `NE`, `SE`, `SW`) y puntos medios (`N`, `E`, `S`, `W`) con cursores contextuales.
+- **Desplazamiento Traslacional**: Arrastre intuitivo desde el cuerpo interior para reposicionar la selección sin alterar dimensiones.
+- **Dimensiones en Tiempo Real**: Badge flotante que indica ancho y alto exactos (`W × H px`).
+- **Cancelación Inmediata**: La pulsación de la tecla `Esc` descarta la selección y restaura el estado en < 100ms.
+
+---
+
 ### Pruebas Automatizadas (TDD)
 ```bash
 # Ejecutar pruebas unitarias de frontend

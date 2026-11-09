@@ -149,3 +149,54 @@ pub fn register_capture_shortcut(
         accelerator,
     })
 }
+
+#[tauri::command]
+pub fn cancel_capture_session() -> Result<SessionStateResponse, String> {
+    Ok(SessionStateResponse {
+        state: CaptureSessionState::Idle,
+    })
+}
+
+#[tauri::command]
+pub fn commit_selection_region(
+    origin_x: f64,
+    origin_y: f64,
+    width: f64,
+    height: f64,
+    scale_factor: f64,
+) -> Result<BoundingBox, String> {
+    if width < 10.0 || height < 10.0 {
+        return Err("Selection dimensions must be at least 10x10 logical pixels".to_string());
+    }
+
+    let origin = DisplayCoordinates::new(origin_x, origin_y).map_err(|e| e.to_string())?;
+    let size = Dimensions::new(width, height).map_err(|e| e.to_string())?;
+    BoundingBox::new(origin, size, scale_factor).map_err(|e| e.to_string())
+}
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cancel_capture_session_returns_idle() {
+        let resp = cancel_capture_session().unwrap();
+        assert_eq!(resp.state, CaptureSessionState::Idle);
+    }
+
+    #[test]
+    fn test_commit_selection_region_valid() {
+        let bbox = commit_selection_region(100.0, 50.0, 400.0, 300.0, 2.0).unwrap();
+        assert_eq!(bbox.origin.x, 100.0);
+        assert_eq!(bbox.origin.y, 50.0);
+        assert_eq!(bbox.size.width, 400.0);
+        assert_eq!(bbox.size.height, 300.0);
+        assert_eq!(bbox.scale_factor, 2.0);
+    }
+
+    #[test]
+    fn test_commit_selection_region_rejects_sub_minimum() {
+        let res = commit_selection_region(100.0, 50.0, 5.0, 300.0, 2.0);
+        assert!(res.is_err());
+    }
+}

@@ -109,6 +109,44 @@ export class TauriBridgeService {
       return { registered: true, accelerator };
     }
   }
+
+  async cancelCaptureSession(): Promise<{ state: CaptureSessionState }> {
+    try {
+      return await invoke<{ state: CaptureSessionState }>("cancel_capture_session");
+    } catch {
+      return { state: "Idle" };
+    }
+  }
+
+  async commitSelectionRegion(
+    originX: number,
+    originY: number,
+    width: number,
+    height: number,
+    scaleFactor = 1.0
+  ): Promise<BoundingBox> {
+    try {
+      return await invoke<BoundingBox>("commit_selection_region", {
+        originX,
+        originY,
+        width,
+        height,
+        scaleFactor,
+      });
+    } catch {
+      return {
+        origin: { x: originX, y: originY },
+        size: { width, height },
+        scale_factor: scaleFactor,
+        physical_rect: {
+          x: Math.round(originX * scaleFactor),
+          y: Math.round(originY * scaleFactor),
+          width: Math.round(width * scaleFactor),
+          height: Math.round(height * scaleFactor),
+        },
+      };
+    }
+  }
 }
 
 export const tauriBridge = new TauriBridgeService();

@@ -20,11 +20,7 @@ export interface BoundingBox {
   };
 }
 
-export type CaptureSessionState =
-  | "Idle"
-  | "Selecting"
-  | "Completed"
-  | "Cancelled";
+export type CaptureSessionState = "Idle" | "Selecting" | "Completed" | "Cancelled";
 
 export interface AppInfo {
   name: string;
