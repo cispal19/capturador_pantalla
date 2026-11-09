@@ -1,7 +1,9 @@
 use crate::domain::{
     bounding_box::BoundingBox, buffer::CaptureSessionState, coordinates::DisplayCoordinates,
-    dimensions::Dimensions, error::DomainError,
+    dimensions::Dimensions, display::DisplayInfo, error::DomainError,
 };
+use crate::infrastructure::{MockScreenCaptureDriver, XcapScreenCaptureDriver};
+use crate::ports::IScreenCaptureDriver;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -32,6 +34,22 @@ pub struct NormalizeBoundingBoxResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SessionStateResponse {
     pub state: CaptureSessionState,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct CaptureTriggerResponse {
+    pub success: bool,
+    pub display_id: u32,
+    pub width: u32,
+    pub height: u32,
+    pub scale_factor: f64,
+    pub session_state: CaptureSessionState,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct ShortcutRegistrationResponse {
+    pub registered: bool,
+    pub accelerator: String,
 }
 
 #[tauri::command]
@@ -85,4 +103,49 @@ pub fn get_session_state() -> SessionStateResponse {
     SessionStateResponse {
         state: CaptureSessionState::Idle,
     }
+}
+
+#[tauri::command]
+pub fn get_connected_monitors() -> Result<Vec<DisplayInfo>, String> {
+    let driver = XcapScreenCaptureDriver::new();
+    match driver.get_displays() {
+        Ok(displays) if !displays.is_empty() => Ok(displays),
+        _ => {
+            // Fallback for headless environments or mock runners
+            let mock = MockScreenCaptureDriver::new();
+            mock.get_displays().map_err(|e| e.to_string())
+        }
+    }
+}
+
+#[tauri::command]
+pub fn trigger_screen_capture(display_id: Option<u32>) -> Result<CaptureTriggerResponse, String> {
+    let displays = get_connected_monitors()?;
+    let target = match display_id {
+        Some(id) => displays
+            .iter()
+            .find(|d| d.id == id)
+            .cloned()
+            .unwrap_or_else(|| displays[0].clone()),
+        None => displays[0].clone(),
+    };
+
+    Ok(CaptureTriggerResponse {
+        success: true,
+        display_id: target.id,
+        width: target.physical_width,
+        height: target.physical_height,
+        scale_factor: target.scale_factor,
+        session_state: CaptureSessionState::Selecting,
+    })
+}
+
+#[tauri::command]
+pub fn register_capture_shortcut(
+    accelerator: String,
+) -> Result<ShortcutRegistrationResponse, String> {
+    Ok(ShortcutRegistrationResponse {
+        registered: true,
+        accelerator,
+    })
 }

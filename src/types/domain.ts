@@ -20,7 +20,11 @@ export interface BoundingBox {
   };
 }
 
-export type CaptureSessionState = "Idle" | "Selecting" | "Completed" | "Cancelled";
+export type CaptureSessionState =
+  | "Idle"
+  | "Selecting"
+  | "Completed"
+  | "Cancelled";
 
 export interface AppInfo {
   name: string;
@@ -28,4 +32,24 @@ export interface AppInfo {
   environment: "development" | "production";
   os: "macos" | "windows" | "linux";
   local_first_verified: boolean;
+}
+
+export interface DisplayInfo {
+  id: number;
+  name: string;
+  logical_width: number;
+  logical_height: number;
+  physical_width: number;
+  physical_height: number;
+  scale_factor: number;
+  is_primary: boolean;
+}
+
+export interface CaptureTriggerResult {
+  success: boolean;
+  display_id: number;
+  width: number;
+  height: number;
+  scale_factor: number;
+  session_state: CaptureSessionState;
 }

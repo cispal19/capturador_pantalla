@@ -45,7 +45,22 @@ capturador_pantalla/
 
 ---
 
-## 🛠️ Comandos de Desarrollo y Verificación
+## ⌨️ Atajos de Teclado y Bandeja del Sistema (System Tray)
+
+La aplicación reside discretamente en segundo plano y responde a atajos globales del sistema operativo:
+
+- **Atajo Predeterminado de Captura**:
+  - macOS: `CommandOrControl+Shift+X` (configurable a `PrintScreen`)
+  - Windows / Linux: `PrintScreen` o `Ctrl+Shift+X`
+- **Menú de la Bandeja del Sistema (Tray Icon)**:
+  - **Tomar Captura**: Dispara la sesión interactiva de captura inmediatamente.
+  - **Preferencias**: Acceso a configuración de atajos y almacenamiento local.
+  - **Salir**: Termina la aplicación de forma limpia liberando recursos de memoria y controladores globales.
+- **Detección de Monitores y Permisos**:
+  - Soporte nativo multimonitor con enumeración física (`xcap`) y ajuste automático de escala DPI (`scale_factor`).
+  - Verificación y guía proactiva de permisos de grabación de pantalla en macOS.
+
+---
 
 ### Pruebas Automatizadas (TDD)
 ```bash

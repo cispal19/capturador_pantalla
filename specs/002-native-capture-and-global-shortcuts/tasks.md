@@ -23,9 +23,9 @@ description: "Task list for feature 002-native-capture-and-global-shortcuts"
 
 **Purpose**: Dependency management and Tauri plugin configuration
 
-- [ ] T001 Add `xcap` crate and `image` crate dependencies in `src-tauri/Cargo.toml`
-- [ ] T002 [P] Add `tauri-plugin-global-shortcut` to `src-tauri/Cargo.toml` and `@tauri-apps/plugin-global-shortcut` to `package.json`
-- [ ] T003 [P] Configure global shortcut plugin permissions and tray settings in `src-tauri/tauri.conf.json`
+- [x] T001 Add `xcap` crate and `image` crate dependencies in `src-tauri/Cargo.toml`
+- [x] T002 [P] Add `tauri-plugin-global-shortcut` to `src-tauri/Cargo.toml` and `@tauri-apps/plugin-global-shortcut` to `package.json`
+- [x] T003 [P] Configure global shortcut plugin permissions and tray settings in `src-tauri/tauri.conf.json`
 
 ---
 
@@ -35,9 +35,9 @@ description: "Task list for feature 002-native-capture-and-global-shortcuts"
 
 **⚠️ CRITICAL**: No user story work can begin until this foundational phase is complete
 
-- [ ] T004 [P] Define `DisplayInfo` Value Object in `src-tauri/src/domain/display.rs` and export in `src-tauri/src/domain/mod.rs`
-- [ ] T005 [P] Define TypeScript interface `DisplayInfo` in `src/types/domain.ts`
-- [ ] T006 [P] Update `IScreenCaptureDriver` and `IGlobalShortcutDriver` traits in `src-tauri/src/ports/mod.rs` per `contracts/capture-service.md`
+- [x] T004 [P] Define `DisplayInfo` Value Object in `src-tauri/src/domain/display.rs` and export in `src-tauri/src/domain/mod.rs`
+- [x] T005 [P] Define TypeScript interface `DisplayInfo` in `src/types/domain.ts`
+- [x] T006 [P] Update `IScreenCaptureDriver` and `IGlobalShortcutDriver` traits in `src-tauri/src/ports/mod.rs` per `contracts/capture-service.md`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin.
 
@@ -52,15 +52,15 @@ description: "Task list for feature 002-native-capture-and-global-shortcuts"
 ### Tests for User Story 1 ⚠️
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T007 [P] [US1] Write unit tests for `TriggerCaptureSessionUseCase` verifying debounce logic and session state transition to `Selecting` in `src-tauri/src/application/capture.rs`
-- [ ] T008 [P] [US1] Write unit tests for `MockShortcutDriver` verifying registration and unregistration in `src-tauri/src/infrastructure/mock_shortcut.rs`
+- [x] T007 [P] [US1] Write unit tests for `TriggerCaptureSessionUseCase` verifying debounce logic and session state transition to `Selecting` in `src-tauri/src/application/capture.rs`
+- [x] T008 [P] [US1] Write unit tests for `MockShortcutDriver` verifying registration and unregistration in `src-tauri/src/infrastructure/mock_shortcut.rs`
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Implement `TriggerCaptureSessionUseCase` in `src-tauri/src/application/capture.rs`
-- [ ] T010 [US1] Implement `TauriGlobalShortcutDriver` adapter in `src-tauri/src/infrastructure/tauri_shortcut.rs`
-- [ ] T011 [US1] Register global shortcut plugin and default hotkey binding in `src-tauri/src/lib.rs`
-- [ ] T012 [US1] Implement frontend bridge method `registerCaptureShortcut` in `src/services/tauriBridge.ts`
+- [x] T009 [US1] Implement `TriggerCaptureSessionUseCase` in `src-tauri/src/application/capture.rs`
+- [x] T010 [US1] Implement `TauriGlobalShortcutDriver` adapter in `src-tauri/src/infrastructure/tauri_shortcut.rs`
+- [x] T011 [US1] Register global shortcut plugin and default hotkey binding in `src-tauri/src/lib.rs`
+- [x] T012 [US1] Implement frontend bridge method `registerCaptureShortcut` in `src/services/tauriBridge.ts`
 
 **Checkpoint**: User Story 1 is functional: global shortcut triggers capture session.
 
@@ -75,16 +75,16 @@ description: "Task list for feature 002-native-capture-and-global-shortcuts"
 ### Tests for User Story 2 ⚠️
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T013 [P] [US2] Write unit tests for `DisplayInfo` invariants (`logical_width > 0`, `scale_factor > 0.0`) in `src-tauri/src/domain/display.rs`
-- [ ] T014 [P] [US2] Write unit tests for `MockScreenCaptureDriver` synthetic multi-monitor pattern generation in `src-tauri/src/infrastructure/mock_capture.rs`
+- [x] T013 [P] [US2] Write unit tests for `DisplayInfo` invariants (`logical_width > 0`, `scale_factor > 0.0`) in `src-tauri/src/domain/display.rs`
+- [x] T014 [P] [US2] Write unit tests for `MockScreenCaptureDriver` synthetic multi-monitor pattern generation in `src-tauri/src/infrastructure/mock_capture.rs`
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Implement `MockScreenCaptureDriver` with gradient pattern generator in `src-tauri/src/infrastructure/mock_capture.rs`
-- [ ] T016 [US2] Implement `XcapScreenCaptureDriver` adapter mapping physical monitors to `RawDisplayBuffer` in `src-tauri/src/infrastructure/xcap_capture.rs`
-- [ ] T017 [US2] Implement Tauri IPC commands `get_connected_monitors` and `trigger_screen_capture` in `src-tauri/src/presentation/commands.rs`
-- [ ] T018 [US2] Implement frontend bridge methods `getConnectedMonitors` and `triggerScreenCapture` in `src/services/tauriBridge.ts`
-- [ ] T019 [P] [US2] Write frontend unit tests for monitor discovery in `src/services/tauriBridge.test.ts`
+- [x] T015 [US2] Implement `MockScreenCaptureDriver` with gradient pattern generator in `src-tauri/src/infrastructure/mock_capture.rs`
+- [x] T016 [US2] Implement `XcapScreenCaptureDriver` adapter mapping physical monitors to `RawDisplayBuffer` in `src-tauri/src/infrastructure/xcap_capture.rs`
+- [x] T017 [US2] Implement Tauri IPC commands `get_connected_monitors` and `trigger_screen_capture` in `src-tauri/src/presentation/commands.rs`
+- [x] T018 [US2] Implement frontend bridge methods `getConnectedMonitors` and `triggerScreenCapture` in `src/services/tauriBridge.ts`
+- [x] T019 [P] [US2] Write frontend unit tests for monitor discovery in `src/services/tauriBridge.test.ts`
 
 **Checkpoint**: User Story 2 is functional: displays can be enumerated and captured into raw memory buffers.
 
@@ -98,13 +98,13 @@ description: "Task list for feature 002-native-capture-and-global-shortcuts"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T020 [P] [US3] Write unit tests for permission error handling and validation in `src-tauri/src/infrastructure/permissions.rs`
+- [x] T020 [P] [US3] Write unit tests for permission error handling and validation in `src-tauri/src/infrastructure/permissions.rs`
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Implement System Tray menu builder and click event dispatchers in `src-tauri/src/presentation/tray.rs`
-- [ ] T022 [US3] Implement OS screen recording permission detection in `src-tauri/src/infrastructure/permissions.rs`
-- [ ] T023 [US3] Mount System Tray in application runtime in `src-tauri/src/lib.rs`
+- [x] T021 [US3] Implement System Tray menu builder and click event dispatchers in `src-tauri/src/presentation/tray.rs`
+- [x] T022 [US3] Implement OS screen recording permission detection in `src-tauri/src/infrastructure/permissions.rs`
+- [x] T023 [US3] Mount System Tray in application runtime in `src-tauri/src/lib.rs`
 
 **Checkpoint**: All user stories complete and functional.
 
@@ -114,9 +114,9 @@ description: "Task list for feature 002-native-capture-and-global-shortcuts"
 
 **Purpose**: Documentation, quickstart verification, and static analysis
 
-- [ ] T024 [P] Update `README.md` with shortcut configuration and system tray documentation
-- [ ] T025 Execute end-to-end quickstart validation following `specs/002-native-capture-and-global-shortcuts/quickstart.md`
-- [ ] T026 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)
+- [x] T024 [P] Update `README.md` with shortcut configuration and system tray documentation
+- [x] T025 Execute end-to-end quickstart validation following `specs/002-native-capture-and-global-shortcuts/quickstart.md`
+- [x] T026 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)
 
 ---
 

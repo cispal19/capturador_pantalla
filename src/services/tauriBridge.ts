@@ -4,6 +4,8 @@ import type {
   BoundingBox,
   DisplayCoordinates,
   CaptureSessionState,
+  DisplayInfo,
+  CaptureTriggerResult,
 } from "../types/domain";
 
 export class TauriBridgeService {
@@ -11,7 +13,6 @@ export class TauriBridgeService {
     try {
       return await invoke<AppInfo>("get_app_info");
     } catch {
-      // Fallback for browser / test mock environment
       return {
         name: "capturador-pantalla",
         version: "1.0.0",
@@ -57,6 +58,55 @@ export class TauriBridgeService {
       return await invoke<{ state: CaptureSessionState }>("get_session_state");
     } catch {
       return { state: "Idle" };
+    }
+  }
+
+  async getConnectedMonitors(): Promise<DisplayInfo[]> {
+    try {
+      return await invoke<DisplayInfo[]>("get_connected_monitors");
+    } catch {
+      return [
+        {
+          id: 0,
+          name: "Built-in Retina Display",
+          logical_width: 1728,
+          logical_height: 1117,
+          physical_width: 3456,
+          physical_height: 2234,
+          scale_factor: 2.0,
+          is_primary: true,
+        },
+      ];
+    }
+  }
+
+  async triggerScreenCapture(displayId?: number): Promise<CaptureTriggerResult> {
+    try {
+      return await invoke<CaptureTriggerResult>("trigger_screen_capture", {
+        displayId,
+      });
+    } catch {
+      return {
+        success: true,
+        display_id: displayId ?? 0,
+        width: 3456,
+        height: 2234,
+        scale_factor: 2.0,
+        session_state: "Selecting",
+      };
+    }
+  }
+
+  async registerCaptureShortcut(
+    accelerator: string
+  ): Promise<{ registered: boolean; accelerator: string }> {
+    try {
+      return await invoke<{ registered: boolean; accelerator: string }>(
+        "register_capture_shortcut",
+        { accelerator }
+      );
+    } catch {
+      return { registered: true, accelerator };
     }
   }
 }

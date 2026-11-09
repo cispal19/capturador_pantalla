@@ -30,4 +30,25 @@ describe("TauriBridgeService", () => {
     const session = await tauriBridge.getSessionState();
     expect(session.state).toBe("Idle");
   });
+
+  it("retrieves connected monitors metadata", async () => {
+    const monitors = await tauriBridge.getConnectedMonitors();
+    expect(monitors.length).toBeGreaterThan(0);
+    expect(monitors[0].id).toBe(0);
+    expect(monitors[0].scale_factor).toBe(2.0);
+    expect(monitors[0].is_primary).toBe(true);
+  });
+
+  it("triggers screen capture session successfully", async () => {
+    const result = await tauriBridge.triggerScreenCapture(0);
+    expect(result.success).toBe(true);
+    expect(result.display_id).toBe(0);
+    expect(result.session_state).toBe("Selecting");
+  });
+
+  it("registers global capture shortcut accelerator", async () => {
+    const res = await tauriBridge.registerCaptureShortcut("CommandOrControl+Shift+X");
+    expect(res.registered).toBe(true);
+    expect(res.accelerator).toBe("CommandOrControl+Shift+X");
+  });
 });

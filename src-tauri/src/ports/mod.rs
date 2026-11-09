@@ -1,25 +1,38 @@
-use crate::domain::buffer::RawDisplayBuffer;
+use crate::domain::{buffer::RawDisplayBuffer, display::DisplayInfo};
 use std::path::{Path, PathBuf};
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, thiserror::Error, Clone, PartialEq)]
 pub enum CaptureDriverError {
     #[error("Permission denied to record screen")]
     PermissionDenied,
     #[error("No active display detected")]
     NoDisplayFound,
+    #[error("Display with id {0} not found")]
+    DisplayNotFound(u32),
     #[error("Internal capture error: {0}")]
     Internal(String),
 }
 
 pub trait IScreenCaptureDriver: Send + Sync {
+    /// Enumerate all connected physical displays
+    fn get_displays(&self) -> Result<Vec<DisplayInfo>, CaptureDriverError>;
+
     /// Captures the primary or active display into raw memory
     fn capture_active_display(&self) -> Result<RawDisplayBuffer, CaptureDriverError>;
 
+    /// Capture raw pixel buffer from a specific display by its ID
+    fn capture_display_by_id(
+        &self,
+        display_id: u32,
+    ) -> Result<RawDisplayBuffer, CaptureDriverError>;
+
     /// Captures all connected displays (for multi-monitor setups)
-    fn capture_all_displays(&self) -> Result<Vec<RawDisplayBuffer>, CaptureDriverError>;
+    fn capture_all_displays(
+        &self,
+    ) -> Result<Vec<(DisplayInfo, RawDisplayBuffer)>, CaptureDriverError>;
 }
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, thiserror::Error, Clone, PartialEq)]
 pub enum ClipboardDriverError {
     #[error("Failed to access system clipboard: {0}")]
     AccessFailed(String),
@@ -35,10 +48,10 @@ pub trait IClipboardDriver: Send + Sync {
     fn clear(&self) -> Result<(), ClipboardDriverError>;
 }
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, thiserror::Error, Clone, PartialEq)]
 pub enum FileSystemDriverError {
     #[error("IO error: {0}")]
-    Io(#[from] std::io::Error),
+    Io(String),
     #[error("Encoding error: {0}")]
     Encoding(String),
 }
@@ -66,7 +79,7 @@ pub trait IFileSystemDriver: Send + Sync {
     fn write_text_file(&self, path: &Path, content: &str) -> Result<(), FileSystemDriverError>;
 }
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, thiserror::Error, Clone, PartialEq)]
 pub enum ShortcutDriverError {
     #[error("Shortcut combination already registered: {0}")]
     AlreadyRegistered(String),
@@ -81,8 +94,11 @@ pub trait IGlobalShortcutDriver: Send + Sync {
     fn register_shortcut(
         &self,
         accelerator: &str,
-        callback: Box<dyn Fn() + Send + 'static>,
+        callback: Box<dyn Fn() + Send + Sync + 'static>,
     ) -> Result<(), ShortcutDriverError>;
+
+    /// Check if shortcut is currently active
+    fn is_registered(&self, accelerator: &str) -> bool;
 
     /// Unregisters all registered hotkeys
     fn unregister_all(&self) -> Result<(), ShortcutDriverError>;
