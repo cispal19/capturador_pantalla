@@ -279,6 +279,45 @@ describe("SelectionOverlay Component", () => {
     expect(exportFileSpy).toHaveBeenCalledOnce();
   });
 
+  it("renders clean capture without selection borders or handles during export", async () => {
+    const canvas = container.querySelector("canvas")!;
+    const mockCtx = {
+      getImageData: vi.fn().mockReturnValue({
+        width: 100,
+        height: 100,
+        data: new Uint8ClampedArray(100 * 100 * 4),
+      }),
+      clearRect: vi.fn(),
+      drawImage: vi.fn(),
+      fillRect: vi.fn(),
+      strokeRect: vi.fn(),
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      rect: vi.fn(),
+      clip: vi.fn(),
+      measureText: vi.fn().mockReturnValue({ width: 50 }),
+      fillText: vi.fn(),
+      roundRect: vi.fn(),
+      setLineDash: vi.fn(),
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (overlay as any).ctx = mockCtx;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const renderContentSpy = vi.spyOn(overlay as any, "renderContent");
+
+    // Create selection (100, 100, 200, 200)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 300, clientY: 300 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 300, clientY: 300 }));
+
+    await overlay.exportToClipboard();
+
+    // Verify renderContent(false) was called to strip border and handles during extraction
+    expect(renderContentSpy).toHaveBeenCalledWith(false);
+  });
+
   it("initiates and controls screen recording from toolbar (Feature 007)", async () => {
     const canvas = container.querySelector("canvas")!;
 

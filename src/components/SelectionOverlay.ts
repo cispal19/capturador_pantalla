@@ -166,21 +166,37 @@ export class SelectionOverlay {
     void tauriBridge.syncAnnotations(this.history.getItems());
   }
 
-  async exportToClipboard(): Promise<boolean> {
-    if (!this.activeBox || !this.ctx) return false;
+  private extractCleanSelectionImageData(): ImageData | null {
+    if (!this.activeBox || !this.ctx) return null;
 
     const { x, y, width, height } = this.activeBox;
     const w = Math.round(width);
     const h = Math.round(height);
-    if (w < 10 || h < 10) return false;
+    if (w < 10 || h < 10) return null;
+
+    // Render clean image without UI selection border, handles, or badges
+    this.renderContent(false);
+
+    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+    const px = Math.round(x * dpr);
+    const py = Math.round(y * dpr);
+    const pw = Math.round(w * dpr);
+    const ph = Math.round(h * dpr);
+    const imageData = this.ctx.getImageData(px, py, pw, ph);
+
+    // Restore UI controls for interactive display
+    this.renderContent(true);
+
+    return imageData;
+  }
+
+  async exportToClipboard(): Promise<boolean> {
+    if (!this.activeBox || !this.ctx) return false;
 
     try {
-      const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
-      const px = Math.round(x * dpr);
-      const py = Math.round(y * dpr);
-      const pw = Math.round(w * dpr);
-      const ph = Math.round(h * dpr);
-      const imageData = this.ctx.getImageData(px, py, pw, ph);
+      const imageData = this.extractCleanSelectionImageData();
+      if (!imageData) return false;
+
       await tauriBridge.copyCaptureToClipboard(imageData.width, imageData.height, imageData.data);
       showToast("📋 Captura copiada al portapapeles");
       this.cancel();
@@ -195,18 +211,10 @@ export class SelectionOverlay {
   async exportToFile(format = "png"): Promise<boolean> {
     if (!this.activeBox || !this.ctx) return false;
 
-    const { x, y, width, height } = this.activeBox;
-    const w = Math.round(width);
-    const h = Math.round(height);
-    if (w < 10 || h < 10) return false;
-
     try {
-      const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
-      const px = Math.round(x * dpr);
-      const py = Math.round(y * dpr);
-      const pw = Math.round(w * dpr);
-      const ph = Math.round(h * dpr);
-      const imageData = this.ctx.getImageData(px, py, pw, ph);
+      const imageData = this.extractCleanSelectionImageData();
+      if (!imageData) return false;
+
       const res = await tauriBridge.saveCaptureToFile(
         imageData.width,
         imageData.height,
@@ -226,18 +234,10 @@ export class SelectionOverlay {
   async exportToGif(fps = 15): Promise<boolean> {
     if (!this.activeBox || !this.ctx) return false;
 
-    const { x, y, width, height } = this.activeBox;
-    const w = Math.round(width);
-    const h = Math.round(height);
-    if (w < 10 || h < 10) return false;
-
     try {
-      const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
-      const px = Math.round(x * dpr);
-      const py = Math.round(y * dpr);
-      const pw = Math.round(w * dpr);
-      const ph = Math.round(h * dpr);
-      const imageData = this.ctx.getImageData(px, py, pw, ph);
+      const imageData = this.extractCleanSelectionImageData();
+      if (!imageData) return false;
+
       const frames = [imageData.data, imageData.data];
       const res = await tauriBridge.exportFramesToGif(
         imageData.width,
@@ -709,6 +709,10 @@ export class SelectionOverlay {
   }
 
   private render() {
+    this.renderContent(true);
+  }
+
+  private renderContent(withControls = true) {
     this.animationFrameId = null;
     if (!this.ctx) return;
 
@@ -723,23 +727,27 @@ export class SelectionOverlay {
       this.ctx.drawImage(this.bgImage, 0, 0, width, height);
     }
 
-    // 2. Draw 40% dimming over whole canvas
-    this.ctx.fillStyle = `rgba(0, 0, 0, ${this.config.dimOpacity})`;
-    this.ctx.fillRect(0, 0, width, height);
+    if (withControls) {
+      // 2. Draw 40% dimming over whole canvas
+      this.ctx.fillStyle = `rgba(0, 0, 0, ${this.config.dimOpacity})`;
+      this.ctx.fillRect(0, 0, width, height);
+    }
 
     if (this.activeBox && this.activeBox.width > 0 && this.activeBox.height > 0) {
       const { x, y, width: bw, height: bh } = this.activeBox;
 
-      // 3. Clear dimming in selection rectangle and reveal bright background
-      if (this.bgImage && (this.bgImage.complete || this.bgImage.naturalWidth > 0)) {
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.rect(x, y, bw, bh);
-        this.ctx.clip();
-        this.ctx.drawImage(this.bgImage, 0, 0, width, height);
-        this.ctx.restore();
-      } else {
-        this.ctx.clearRect(x, y, bw, bh);
+      if (withControls) {
+        // 3. Clear dimming in selection rectangle and reveal bright background
+        if (this.bgImage && (this.bgImage.complete || this.bgImage.naturalWidth > 0)) {
+          this.ctx.save();
+          this.ctx.beginPath();
+          this.ctx.rect(x, y, bw, bh);
+          this.ctx.clip();
+          this.ctx.drawImage(this.bgImage, 0, 0, width, height);
+          this.ctx.restore();
+        } else {
+          this.ctx.clearRect(x, y, bw, bh);
+        }
       }
 
       // 4. Render committed annotations + active preview
@@ -756,61 +764,63 @@ export class SelectionOverlay {
       }
       this.ctx.restore();
 
-      // 4. Draw bounding box border
-      this.ctx.strokeStyle = this.isRecording ? "#ef4444" : this.config.borderColor;
-      this.ctx.lineWidth = this.isRecording ? 3 : this.config.borderWidth;
-      if (this.isRecording) {
-        this.ctx.setLineDash([8, 4]);
+      if (withControls) {
+        // 5. Draw bounding box border
+        this.ctx.strokeStyle = this.isRecording ? "#ef4444" : this.config.borderColor;
+        this.ctx.lineWidth = this.isRecording ? 3 : this.config.borderWidth;
+        if (this.isRecording) {
+          this.ctx.setLineDash([8, 4]);
+        }
+        this.ctx.strokeRect(x, y, bw, bh);
+        if (this.isRecording) {
+          this.ctx.setLineDash([]);
+        }
+
+        // 6. Draw 8 resize handles
+        const anchors = getHandleAnchors(this.activeBox);
+        const halfSize = this.config.handleSize / 2;
+
+        for (const anchor of anchors) {
+          this.ctx.fillStyle = this.config.handleColor;
+          this.ctx.fillRect(
+            anchor.x - halfSize,
+            anchor.y - halfSize,
+            this.config.handleSize,
+            this.config.handleSize
+          );
+          this.ctx.strokeStyle = this.config.handleBorderColor;
+          this.ctx.lineWidth = 1;
+          this.ctx.strokeRect(
+            anchor.x - halfSize,
+            anchor.y - halfSize,
+            this.config.handleSize,
+            this.config.handleSize
+          );
+        }
+
+        // 7. Draw dimensions badge
+        const badgeText = `${Math.round(bw)} × ${Math.round(bh)} px`;
+        this.ctx.font = "12px system-ui, -apple-system, sans-serif";
+        const textMetrics = this.ctx.measureText(badgeText);
+        const badgeW = textMetrics.width + 16;
+        const badgeH = 22;
+
+        let badgeX = x;
+        let badgeY = y - badgeH - 6;
+        if (badgeY < 4) {
+          badgeY = y + 6;
+        }
+        if (badgeX + badgeW > width) {
+          badgeX = width - badgeW - 6;
+        }
+
+        this.ctx.fillStyle = this.config.badgeBgColor;
+        this.ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
+
+        this.ctx.fillStyle = this.config.badgeTextColor;
+        this.ctx.textBaseline = "middle";
+        this.ctx.fillText(badgeText, badgeX + 8, badgeY + badgeH / 2);
       }
-      this.ctx.strokeRect(x, y, bw, bh);
-      if (this.isRecording) {
-        this.ctx.setLineDash([]);
-      }
-
-      // 5. Draw 8 resize handles
-      const anchors = getHandleAnchors(this.activeBox);
-      const halfSize = this.config.handleSize / 2;
-
-      for (const anchor of anchors) {
-        this.ctx.fillStyle = this.config.handleColor;
-        this.ctx.fillRect(
-          anchor.x - halfSize,
-          anchor.y - halfSize,
-          this.config.handleSize,
-          this.config.handleSize
-        );
-        this.ctx.strokeStyle = this.config.handleBorderColor;
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(
-          anchor.x - halfSize,
-          anchor.y - halfSize,
-          this.config.handleSize,
-          this.config.handleSize
-        );
-      }
-
-      // 6. Draw dimensions badge
-      const badgeText = `${Math.round(bw)} × ${Math.round(bh)} px`;
-      this.ctx.font = "12px system-ui, -apple-system, sans-serif";
-      const textMetrics = this.ctx.measureText(badgeText);
-      const badgeW = textMetrics.width + 16;
-      const badgeH = 22;
-
-      let badgeX = x;
-      let badgeY = y - badgeH - 6;
-      if (badgeY < 4) {
-        badgeY = y + 6;
-      }
-      if (badgeX + badgeW > width) {
-        badgeX = width - badgeW - 6;
-      }
-
-      this.ctx.fillStyle = this.config.badgeBgColor;
-      this.ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
-
-      this.ctx.fillStyle = this.config.badgeTextColor;
-      this.ctx.textBaseline = "middle";
-      this.ctx.fillText(badgeText, badgeX + 8, badgeY + badgeH / 2);
     }
   }
 
