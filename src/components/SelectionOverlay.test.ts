@@ -194,6 +194,32 @@ describe("SelectionOverlay Component", () => {
     expect(exportSpy).toHaveBeenCalledOnce();
   });
 
+  it("exports to clipboard on Cmd+C / Ctrl+C key press when selection is active", async () => {
+    const canvas = container.querySelector("canvas")!;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.getImageData = vi.fn().mockReturnValue({
+        width: 100,
+        height: 100,
+        data: new Uint8ClampedArray(100 * 100 * 4),
+      });
+    }
+
+    const exportSpy = vi.spyOn(overlay, "exportToClipboard");
+
+    // Create selection (100, 100, 200, 200)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 300, clientY: 300 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 300, clientY: 300 }));
+
+    expect(overlay.getActiveBox()).not.toBeNull();
+
+    // Press Cmd+C
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "c", metaKey: true }));
+
+    expect(exportSpy).toHaveBeenCalledOnce();
+  });
+
   it("exports to file on Cmd+S / Ctrl+S key press when selection is active (Feature 005)", async () => {
     const canvas = container.querySelector("canvas")!;
     const ctx = canvas.getContext("2d");

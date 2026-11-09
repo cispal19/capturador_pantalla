@@ -61,6 +61,9 @@ async function renderApp() {
         <button id="btn-preferences" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 0.75rem 1.25rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;">
           ⚙️ Preferencias
         </button>
+        <button id="btn-hide" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; padding: 0.75rem 1.25rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;" title="Ocultar la ventana en segundo plano (puedes restaurarla desde el ícono de la bandeja)">
+          🙈 Ocultar a la Bandeja
+        </button>
       </div>
       <p style="font-size: 0.85rem; color: #64748b; margin-top: -0.5rem; margin-bottom: 1rem;">
         O presiona el atajo global: <kbd style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">Command/Ctrl + Shift + X</kbd> (Cancela con <kbd style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">Esc</kbd>)
@@ -93,11 +96,36 @@ async function renderApp() {
     });
   }
 
+  const btnHide = document.getElementById("btn-hide");
+  if (btnHide) {
+    btnHide.addEventListener("click", async () => {
+      try {
+        const { getCurrentWindow } = await import("@tauri-apps/api/window");
+        await getCurrentWindow().hide();
+      } catch {}
+    });
+  }
+
   try {
-    void listen("open-preferences", () => {
+    const { getCurrentWindow } = await import("@tauri-apps/api/window");
+    const win = getCurrentWindow();
+    await win.onCloseRequested(async (event) => {
+      event.preventDefault();
+      await win.hide();
+    });
+
+    void listen("open-preferences", async () => {
+      try {
+        await win.show();
+        await win.setFocus();
+      } catch {}
       void settingsModal?.open();
     });
-    void listen("trigger-capture", () => {
+    void listen("trigger-capture", async () => {
+      try {
+        await win.show();
+        await win.setFocus();
+      } catch {}
       void startSelection();
     });
   } catch {

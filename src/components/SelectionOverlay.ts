@@ -165,6 +165,7 @@ export class SelectionOverlay {
       await tauriBridge.copyCaptureToClipboard(w, h, imageData.data);
       showToast("📋 Captura copiada al portapapeles");
       this.cancel();
+      void this.hideWindowIfDesktop();
       return true;
     } catch {
       showToast("⚠️ Error al copiar al portapapeles");
@@ -185,6 +186,7 @@ export class SelectionOverlay {
       const res = await tauriBridge.saveCaptureToFile(w, h, imageData.data, format);
       showToast(`💾 Captura guardada en ${res.filePath}`);
       this.cancel();
+      void this.hideWindowIfDesktop();
       return true;
     } catch {
       showToast("⚠️ Error al guardar captura en disco");
@@ -206,6 +208,7 @@ export class SelectionOverlay {
       const res = await tauriBridge.exportFramesToGif(w, h, frames, fps);
       showToast(`🎞️ GIF exportado en ${res.filePath}`);
       this.cancel();
+      void this.hideWindowIfDesktop();
       return true;
     } catch {
       showToast("⚠️ Error al exportar GIF");
@@ -610,9 +613,17 @@ export class SelectionOverlay {
     }
   }
 
+  private async hideWindowIfDesktop() {
+    try {
+      const { getCurrentWindow } = await import("@tauri-apps/api/window");
+      await getCurrentWindow().hide();
+    } catch {}
+  }
+
   private handleKeyDown(e: KeyboardEvent) {
     if (e.key === "Escape") {
       this.cancel();
+      void this.hideWindowIfDesktop();
     } else if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z") && !e.shiftKey) {
       e.preventDefault();
       this.undo();
@@ -622,7 +633,10 @@ export class SelectionOverlay {
     ) {
       e.preventDefault();
       this.redo();
-    } else if (e.key === "Enter" && this.activeBox) {
+    } else if (
+      (e.key === "Enter" || ((e.ctrlKey || e.metaKey) && (e.key === "c" || e.key === "C"))) &&
+      this.activeBox
+    ) {
       e.preventDefault();
       void this.exportToClipboard();
     } else if ((e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S") && this.activeBox) {
