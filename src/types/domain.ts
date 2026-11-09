@@ -48,4 +48,5 @@ export interface CaptureTriggerResult {
   height: number;
   scale_factor: number;
   session_state: CaptureSessionState;
+  image_data_url?: string;
 }

@@ -37,12 +37,24 @@ export class SelectionOverlay {
   private drawStartX = 0;
   private drawStartY = 0;
   private isDrawingAnnotation = false;
+  private bgImage: HTMLImageElement | null = null;
 
   private onCancelCallback?: () => void;
   private onSelectionCompleteCallback?: (box: SelectionRect) => void;
 
   constructor(config: Partial<SelectionOverlayConfig> = {}) {
     this.config = { ...DEFAULT_OVERLAY_CONFIG, ...config };
+
+    if (this.config.backgroundImageUrl) {
+      const img = new Image();
+      img.src = this.config.backgroundImageUrl;
+      img.onload = () => {
+        this.bgImage = img;
+        this.requestRender();
+      };
+      this.bgImage = img;
+    }
+
     this.canvas = document.createElement("canvas");
     this.canvas.style.position = "fixed";
     this.canvas.style.top = "0";
@@ -161,8 +173,13 @@ export class SelectionOverlay {
     if (w < 10 || h < 10) return false;
 
     try {
-      const imageData = this.ctx.getImageData(Math.round(x), Math.round(y), w, h);
-      await tauriBridge.copyCaptureToClipboard(w, h, imageData.data);
+      const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+      const px = Math.round(x * dpr);
+      const py = Math.round(y * dpr);
+      const pw = Math.round(w * dpr);
+      const ph = Math.round(h * dpr);
+      const imageData = this.ctx.getImageData(px, py, pw, ph);
+      await tauriBridge.copyCaptureToClipboard(imageData.width, imageData.height, imageData.data);
       showToast("📋 Captura copiada al portapapeles");
       this.cancel();
       void this.hideWindowIfDesktop();
@@ -182,8 +199,18 @@ export class SelectionOverlay {
     if (w < 10 || h < 10) return false;
 
     try {
-      const imageData = this.ctx.getImageData(Math.round(x), Math.round(y), w, h);
-      const res = await tauriBridge.saveCaptureToFile(w, h, imageData.data, format);
+      const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+      const px = Math.round(x * dpr);
+      const py = Math.round(y * dpr);
+      const pw = Math.round(w * dpr);
+      const ph = Math.round(h * dpr);
+      const imageData = this.ctx.getImageData(px, py, pw, ph);
+      const res = await tauriBridge.saveCaptureToFile(
+        imageData.width,
+        imageData.height,
+        imageData.data,
+        format
+      );
       showToast(`💾 Captura guardada en ${res.filePath}`);
       this.cancel();
       void this.hideWindowIfDesktop();
@@ -203,9 +230,19 @@ export class SelectionOverlay {
     if (w < 10 || h < 10) return false;
 
     try {
-      const imageData = this.ctx.getImageData(Math.round(x), Math.round(y), w, h);
+      const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+      const px = Math.round(x * dpr);
+      const py = Math.round(y * dpr);
+      const pw = Math.round(w * dpr);
+      const ph = Math.round(h * dpr);
+      const imageData = this.ctx.getImageData(px, py, pw, ph);
       const frames = [imageData.data, imageData.data];
-      const res = await tauriBridge.exportFramesToGif(w, h, frames, fps);
+      const res = await tauriBridge.exportFramesToGif(
+        imageData.width,
+        imageData.height,
+        frames,
+        fps
+      );
       showToast(`🎞️ GIF exportado en ${res.filePath}`);
       this.cancel();
       void this.hideWindowIfDesktop();
@@ -678,17 +715,31 @@ export class SelectionOverlay {
     // Clear whole canvas
     this.ctx.clearRect(0, 0, width, height);
 
-    // 1. Draw 40% dimming
+    // 1. Draw background image if available
+    if (this.bgImage && (this.bgImage.complete || this.bgImage.naturalWidth > 0)) {
+      this.ctx.drawImage(this.bgImage, 0, 0, width, height);
+    }
+
+    // 2. Draw 40% dimming over whole canvas
     this.ctx.fillStyle = `rgba(0, 0, 0, ${this.config.dimOpacity})`;
     this.ctx.fillRect(0, 0, width, height);
 
     if (this.activeBox && this.activeBox.width > 0 && this.activeBox.height > 0) {
       const { x, y, width: bw, height: bh } = this.activeBox;
 
-      // 2. Clear out selection rectangle
-      this.ctx.clearRect(x, y, bw, bh);
+      // 3. Clear dimming in selection rectangle and reveal bright background
+      if (this.bgImage && (this.bgImage.complete || this.bgImage.naturalWidth > 0)) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.rect(x, y, bw, bh);
+        this.ctx.clip();
+        this.ctx.drawImage(this.bgImage, 0, 0, width, height);
+        this.ctx.restore();
+      } else {
+        this.ctx.clearRect(x, y, bw, bh);
+      }
 
-      // 3. Render committed annotations + active preview
+      // 4. Render committed annotations + active preview
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.rect(x, y, bw, bh);

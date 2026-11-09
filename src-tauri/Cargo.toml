@@ -22,5 +22,6 @@ thiserror = "1.0"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif"] }
 xcap = "0.9"
 arboard = "3"
+base64 = "0.22"
 
 [dev-dependencies]

@@ -65,6 +65,7 @@ pub struct CaptureTriggerResponse {
     pub height: u32,
     pub scale_factor: f64,
     pub session_state: CaptureSessionState,
+    pub image_data_url: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -148,6 +149,9 @@ pub fn get_connected_monitors() -> Result<Vec<DisplayInfo>, String> {
 
 #[tauri::command]
 pub fn trigger_screen_capture(display_id: Option<u32>) -> Result<CaptureTriggerResponse, String> {
+    use base64::engine::general_purpose::STANDARD;
+    use base64::Engine;
+
     let displays = get_connected_monitors()?;
     let target = match display_id {
         Some(id) => displays
@@ -158,6 +162,49 @@ pub fn trigger_screen_capture(display_id: Option<u32>) -> Result<CaptureTriggerR
         None => displays[0].clone(),
     };
 
+    let driver = XcapScreenCaptureDriver::new();
+    let buffer_res = match display_id {
+        Some(id) => driver.capture_display_by_id(id),
+        None => driver.capture_active_display(),
+    };
+
+    let image_data_url = match buffer_res {
+        Ok(buf) => {
+            if let Some(rgba) = image::RgbaImage::from_raw(buf.width, buf.height, buf.data.clone())
+            {
+                let mut bytes = std::io::Cursor::new(Vec::new());
+                if rgba.write_to(&mut bytes, image::ImageFormat::Png).is_ok() {
+                    let encoded = STANDARD.encode(bytes.into_inner());
+                    Some(format!("data:image/png;base64,{}", encoded))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        }
+        Err(_) => {
+            let mock = MockScreenCaptureDriver::new();
+            if let Ok(buf) = mock.capture_active_display() {
+                if let Some(rgba) =
+                    image::RgbaImage::from_raw(buf.width, buf.height, buf.data.clone())
+                {
+                    let mut bytes = std::io::Cursor::new(Vec::new());
+                    if rgba.write_to(&mut bytes, image::ImageFormat::Png).is_ok() {
+                        let encoded = STANDARD.encode(bytes.into_inner());
+                        Some(format!("data:image/png;base64,{}", encoded))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        }
+    };
+
     Ok(CaptureTriggerResponse {
         success: true,
         display_id: target.id,
@@ -165,6 +212,7 @@ pub fn trigger_screen_capture(display_id: Option<u32>) -> Result<CaptureTriggerR
         height: target.physical_height,
         scale_factor: target.scale_factor,
         session_state: CaptureSessionState::Selecting,
+        image_data_url,
     })
 }
 

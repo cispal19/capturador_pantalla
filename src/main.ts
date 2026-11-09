@@ -11,11 +11,42 @@ let settingsModal: SettingsModal | null = null;
 async function startSelection() {
   if (activeOverlay) {
     activeOverlay.destroy();
+    activeOverlay = null;
   }
 
-  await tauriBridge.triggerScreenCapture();
+  // 1. Hide the window first so it is not visible in the desktop screenshot
+  try {
+    const { getCurrentWindow } = await import("@tauri-apps/api/window");
+    const win = getCurrentWindow();
+    await win.hide();
+  } catch {}
 
-  activeOverlay = new SelectionOverlay();
+  // 2. Wait 200ms for OS window server to clear the display
+  await new Promise((r) => setTimeout(r, 200));
+
+  // 3. Trigger native screen capture
+  const captureResult = await tauriBridge.triggerScreenCapture();
+
+  // 4. Hide dashboard HTML elements so only canvas is rendered
+  const rootEl = document.getElementById("root");
+  if (rootEl) {
+    rootEl.style.display = "none";
+  }
+
+  // 5. Expand window to fullscreen overlay covering the entire screen
+  try {
+    const { getCurrentWindow } = await import("@tauri-apps/api/window");
+    const win = getCurrentWindow();
+    await win.setAlwaysOnTop(true);
+    await win.setFullscreen(true);
+    await win.show();
+    await win.setFocus();
+  } catch {}
+
+  // 6. Mount SelectionOverlay with the captured desktop image
+  activeOverlay = new SelectionOverlay({
+    backgroundImageUrl: captureResult.image_data_url,
+  });
   activeOverlay.mount();
 
   activeOverlay.setOnSelectionComplete((box: SelectionRect) => {
@@ -25,15 +56,21 @@ async function startSelection() {
     }
   });
 
-  activeOverlay.setOnCancel(() => {
-    const statusEl = document.getElementById("selection-status");
-    if (statusEl) {
-      statusEl.innerHTML = `ℹ️ Captura cancelada (Esc). Presiona el atajo o botón para reiniciar.`;
+  activeOverlay.setOnCancel(async () => {
+    if (rootEl) {
+      rootEl.style.display = "block";
     }
     if (activeOverlay) {
       activeOverlay.destroy();
       activeOverlay = null;
     }
+    try {
+      const { getCurrentWindow } = await import("@tauri-apps/api/window");
+      const win = getCurrentWindow();
+      await win.setFullscreen(false);
+      await win.setAlwaysOnTop(false);
+      await win.hide();
+    } catch {}
   });
 }
 
