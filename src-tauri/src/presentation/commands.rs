@@ -330,6 +330,7 @@ pub mod tests {
 
     #[test]
     fn test_recording_commands_lifecycle() {
+        let _ = cancel_screen_recording();
         let region = start_screen_recording(100, 100, 400, 300, Some(30), Some(600)).unwrap();
         assert_eq!(region.width, 400);
 
@@ -359,6 +360,7 @@ pub mod tests {
 
     #[test]
     fn test_recording_commands_cancel() {
+        let _ = cancel_screen_recording();
         start_screen_recording(50, 50, 200, 200, None, None).unwrap();
         assert_eq!(
             get_recording_status().unwrap().state,

@@ -45,7 +45,9 @@ export class SelectionOverlay {
   constructor(config: Partial<SelectionOverlayConfig> = {}) {
     this.config = { ...DEFAULT_OVERLAY_CONFIG, ...config };
 
-    if (this.config.backgroundImageUrl) {
+    if (this.config.preloadedImage) {
+      this.bgImage = this.config.preloadedImage;
+    } else if (this.config.backgroundImageUrl) {
       const img = new Image();
       img.src = this.config.backgroundImageUrl;
       img.onload = () => {

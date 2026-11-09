@@ -46,6 +46,7 @@ export interface SelectionOverlayConfig {
   badgeBgColor: string;
   badgeTextColor: string;
   backgroundImageUrl?: string;
+  preloadedImage?: HTMLImageElement | null;
 }
 
 export const DEFAULT_OVERLAY_CONFIG: SelectionOverlayConfig = {
