@@ -6,3 +6,21 @@ Thumbs.db
 .specify/feature.json
 .specify/integrations/packages/
 .specify/integrations/packages.json
+
+# Node & Frontend
+node_modules/
+dist/
+dist-ssr/
+build/
+coverage/
+*.log
+.env*
+.eslintcache
+
+# Rust & Tauri
+target/
+src-tauri/target/
+src-tauri/gen/
+*.rs.bk
+*.rlib
+Cargo.lock.bak

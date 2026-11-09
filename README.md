@@ -16,17 +16,72 @@ El proyecto se desarrolla bajo la metodología **Spec-Driven Development (SDD)**
 
 ---
 
+## 🏗️ Arquitectura de Software (Clean Architecture)
+
+El backend en Rust y el frontend en TypeScript están estructurados en capas estrictamente desacopladas:
+
+```text
+capturador_pantalla/
+├── src-tauri/src/
+│   ├── domain/            # Capa 1: Núcleo de Dominio (Pure Rust, 0 dependencias externas)
+│   │   ├── coordinates.rs # Value Object DisplayCoordinates
+│   │   ├── dimensions.rs  # Value Object Dimensions
+│   │   ├── bounding_box.rs# Value Object BoundingBox (normalización matemática y clamping)
+│   │   ├── buffer.rs      # Entidad RawDisplayBuffer y enum CaptureSessionState
+│   │   └── error.rs       # DomainError
+│   ├── application/       # Capa 2: Casos de Uso
+│   │   └── session.rs     # Gestor del ciclo de vida de captura
+│   ├── ports/             # Capa 3: Contratos de Inversión de Dependencias (Traits)
+│   │   └── mod.rs         # IScreenCaptureDriver, IClipboardDriver, IFileSystemDriver, IGlobalShortcutDriver
+│   ├── infrastructure/    # Capa 4: Adaptadores Concretos del Sistema Operativo
+│   └── presentation/      # Capa 5: Controladores y Comandos IPC de Tauri
+│       └── commands.rs    # get_app_info, normalize_bounding_box, get_session_state
+├── src/                   # Capa de Presentación Web (TypeScript + Vite)
+│   ├── components/        # Componentes de interfaz de usuario
+│   ├── services/          # Cliente IPC tipado (tauriBridge)
+│   ├── types/             # Interfaces TypeScript compartidas
+│   └── main.ts            # Punto de entrada frontend
+```
+
+---
+
+## 🛠️ Comandos de Desarrollo y Verificación
+
+### Pruebas Automatizadas (TDD)
+```bash
+# Ejecutar pruebas unitarias de frontend
+npm run test:frontend
+
+# Ejecutar pruebas unitarias de backend (headless en modo aislado)
+npm run test:backend
+
+# Ejecutar toda la suite de pruebas
+npm test
+```
+
+### Formateo y Análisis Estático
+```bash
+# Verificación de formato
+npm run format:check
+
+# Corrección de formato
+npm run format
+```
+
+### Ejecución en Modo Desarrollo
+```bash
+npm run tauri dev
+```
+
+---
+
 ## 🚀 Hoja de Ruta (Roadmap)
 
 ### Fase 1: MVP v1.0 (Captura de Imágenes Estáticas)
 - Residencia en segundo plano con ícono en la bandeja del sistema (System Tray).
 - Disparo mediante atajos de teclado globales configurables por el usuario.
 - Overlay de pantalla completa fluido con selector de región rectangular interactivo (soporte multimonitor y pantallas HiDPI/Retina).
-- Barra de herramientas flotante:
-  - Figuras (rectángulo, elipse, flecha, línea recta).
-  - Herramienta de texto y lápiz de trazo libre.
-  - Resaltador (highlighter).
-  - **Herramienta de difuminado/ofuscación destructiva (Blur/Pixelate)** para enmascarar contraseñas, tokens y datos personales sensibles (PII).
+- Barra de herramientas flotante con figuras vectoriales y **herramienta de difuminado/ofuscación destructiva (Blur/Pixelate)** para enmascarar contraseñas, tokens y datos personales sensibles (PII).
 - Copia directa al portapapeles (`image/png`) con confirmación sutil.
 - Guardado en disco local (PNG, JPG, WebP) con nomenclatura parametrizable.
 - Cero conexiones de red (100% Local-First).
