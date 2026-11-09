@@ -288,4 +288,32 @@ describe("SelectionOverlay Component", () => {
     expect(stopSpy).toHaveBeenCalledOnce();
     expect(overlay.isRecordingActive()).toBe(false);
   });
+
+  it("exports animated GIF from toolbar button (Feature 008)", async () => {
+    const canvas = container.querySelector("canvas")!;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.getImageData = vi.fn().mockReturnValue({
+        width: 100,
+        height: 100,
+        data: new Uint8ClampedArray(100 * 100 * 4),
+      });
+    }
+
+    const exportGifSpy = vi.spyOn(overlay, "exportToGif");
+
+    // Create selection (100, 100, 200, 200)
+    canvas.dispatchEvent(new MouseEvent("mousedown", { clientX: 100, clientY: 100 }));
+    canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: 300, clientY: 300 }));
+    canvas.dispatchEvent(new MouseEvent("mouseup", { clientX: 300, clientY: 300 }));
+
+    const toolbarEl = overlay.getToolbar().getElement();
+    const gifBtn = toolbarEl.querySelector('[data-action="gif"]') as HTMLButtonElement;
+
+    expect(gifBtn).not.toBeNull();
+    gifBtn.click();
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(exportGifSpy).toHaveBeenCalledOnce();
+  });
 });

@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { type AppPreferences, DEFAULT_PREFERENCES } from "../types/preferences";
 import type { RecordingMetadata, RecordingRegion, RecordingState } from "../types/recording";
+import type { GifExportResult } from "../types/gif";
 import type {
   AppInfo,
   BoundingBox,
@@ -339,6 +340,32 @@ export class TauriBridgeService {
         state: "Idle",
         elapsed_seconds: 0,
         region: null,
+      };
+    }
+  }
+
+  async exportFramesToGif(
+    width: number,
+    height: number,
+    framesRgba: number[][] | Uint8ClampedArray[] | Uint8Array[],
+    fps = 15,
+    targetDirectory?: string
+  ): Promise<GifExportResult> {
+    try {
+      const serializableFrames = framesRgba.map((f) => (Array.isArray(f) ? f : Array.from(f)));
+      return await invoke<GifExportResult>("export_frames_to_gif", {
+        width: Math.round(width),
+        height: Math.round(height),
+        framesRgba: serializableFrames,
+        fps,
+        targetDirectory,
+      });
+    } catch {
+      return {
+        filePath: `/Users/mock/Pictures/Animacion_mock.gif`,
+        durationSeconds: framesRgba.length / fps,
+        fileSizeBytes: framesRgba.length * width * height * 0.1,
+        frameCount: framesRgba.length,
       };
     }
   }

@@ -1,4 +1,6 @@
-use crate::application::{RecordingSessionManager, RecordingStatusResponse};
+use crate::application::{
+    ExportRecordingToGifUseCase, RecordingSessionManager, RecordingStatusResponse,
+};
 use crate::domain::{
     annotation::Annotation,
     bounding_box::BoundingBox,
@@ -7,6 +9,7 @@ use crate::domain::{
     dimensions::Dimensions,
     display::DisplayInfo,
     error::DomainError,
+    gif::{GifExportConfig, GifExportResult},
     naming::FileNameGenerator,
     preferences::AppPreferences,
     recording::{RecordingMetadata, RecordingRegion},
@@ -317,6 +320,16 @@ pub mod tests {
         assert!(cancel_screen_recording().unwrap());
         assert_eq!(get_recording_status().unwrap().state, RecordingState::Idle);
     }
+
+    #[test]
+    fn test_export_frames_to_gif_command() {
+        let frame1 = vec![255, 0, 0, 255].repeat(100); // 10x10
+        let frame2 = vec![0, 255, 0, 255].repeat(100);
+        let res = export_frames_to_gif(10, 10, vec![frame1, frame2], Some(10), None).unwrap();
+        assert_eq!(res.frame_count, 2);
+        assert!(std::path::Path::new(&res.file_path).exists());
+        let _ = std::fs::remove_file(res.file_path);
+    }
 }
 
 #[tauri::command]
@@ -526,4 +539,17 @@ pub fn cancel_screen_recording() -> Result<bool, String> {
 pub fn get_recording_status() -> Result<RecordingStatusResponse, String> {
     let mgr = RECORDING_MANAGER.lock().unwrap();
     Ok(mgr.get_status())
+}
+
+#[tauri::command]
+pub fn export_frames_to_gif(
+    width: u32,
+    height: u32,
+    frames_rgba: Vec<Vec<u8>>,
+    fps: Option<u32>,
+    target_directory: Option<String>,
+) -> Result<GifExportResult, String> {
+    let config = GifExportConfig::new(fps.unwrap_or(15), 15);
+    let dir = target_directory.map(std::path::PathBuf::from);
+    ExportRecordingToGifUseCase::execute(width, height, frames_rgba, config, dir)
 }

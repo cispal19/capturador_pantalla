@@ -23,8 +23,8 @@ description: "Task list for feature 008-gif-recording-and-optimization"
 
 **Purpose**: Add GIF codec feature in Rust backend and TypeScript interfaces
 
-- [ ] T001 Add `gif` feature to `image` crate dependency in `src-tauri/Cargo.toml`
-- [ ] T002 Define TypeScript `GifExportConfig` and `GifExportResult` in `src/types/gif.ts`
+- [x] T001 Add `gif` feature to `image` crate dependency in `src-tauri/Cargo.toml`
+- [x] T002 Define TypeScript `GifExportConfig` and `GifExportResult` in `src/types/gif.ts`
 
 ---
 
@@ -34,9 +34,9 @@ description: "Task list for feature 008-gif-recording-and-optimization"
 
 **⚠️ CRITICAL**: Must write tests first and ensure they fail before implementing.
 
-- [ ] T003 [P] Write unit tests for `GifExportConfig` and `GifExportResult` in `src-tauri/src/domain/gif.rs`
-- [ ] T004 Implement `GifExportConfig` and `GifExportResult` in `src-tauri/src/domain/gif.rs` and export in `src-tauri/src/domain/mod.rs`
-- [ ] T005 [P] Implement `generate_animation_name` in `src-tauri/src/domain/naming.rs` with unit tests
+- [x] T003 [P] Write unit tests for `GifExportConfig` and `GifExportResult` in `src-tauri/src/domain/gif.rs`
+- [x] T004 Implement `GifExportConfig` and `GifExportResult` in `src-tauri/src/domain/gif.rs` and export in `src-tauri/src/domain/mod.rs`
+- [x] T005 [P] Implement `generate_animation_name` in `src-tauri/src/domain/naming.rs` with unit tests
 
 **Checkpoint**: Foundational model and naming helpers tested and ready.
 
@@ -51,14 +51,14 @@ description: "Task list for feature 008-gif-recording-and-optimization"
 ### Tests for User Story 1 & 2 ⚠️
 > **NOTE: Write these tests FIRST, ensure they fail before implementation**
 
-- [ ] T006 [P] [US1] Write unit tests for `ExportRecordingToGifUseCase` in `src-tauri/src/application/gif.rs`
-- [ ] T007 [P] [US1] Write unit tests for `export_frames_to_gif` IPC command in `src-tauri/src/presentation/commands.rs`
+- [x] T006 [P] [US1] Write unit tests for `ExportRecordingToGifUseCase` in `src-tauri/src/application/gif.rs`
+- [x] T007 [P] [US1] Write unit tests for `export_frames_to_gif` IPC command in `src-tauri/src/presentation/commands.rs`
 
 ### Implementation for User Story 1 & 2
 
-- [ ] T008 [US1] Implement `ExportRecordingToGifUseCase` in `src-tauri/src/application/gif.rs` and export in `src-tauri/src/application/mod.rs`
-- [ ] T009 [US1] Implement `export_frames_to_gif` IPC command in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
-- [ ] T010 [US1] Implement `exportFramesToGif` bridge method in `src/services/tauriBridge.ts` with tests in `src/services/tauriBridge.test.ts`
+- [x] T008 [US1] Implement `ExportRecordingToGifUseCase` in `src-tauri/src/application/gif.rs` and export in `src-tauri/src/application/mod.rs`
+- [x] T009 [US1] Implement `export_frames_to_gif` IPC command in `src-tauri/src/presentation/commands.rs` and register in `src-tauri/src/lib.rs`
+- [x] T010 [US1] Implement `exportFramesToGif` bridge method in `src/services/tauriBridge.ts` with tests in `src/services/tauriBridge.test.ts`
 
 **Checkpoint**: User Stories 1 & 2 functional: animated GIFs are encoded and persisted via IPC.
 
@@ -72,12 +72,12 @@ description: "Task list for feature 008-gif-recording-and-optimization"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T011 [P] [US3] Write unit tests for "🎞️ GIF" button in `src/components/AnnotationToolbar.test.ts`
+- [x] T011 [P] [US3] Write unit tests for "🎞️ GIF" button in `src/components/AnnotationToolbar.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Add "🎞️ GIF" button and callback in `src/components/AnnotationToolbar.ts`
-- [ ] T013 [US3] Connect `exportToGif` in `src/components/SelectionOverlay.ts` with tests in `src/components/SelectionOverlay.test.ts`
+- [x] T012 [US3] Add "🎞️ GIF" button and callback in `src/components/AnnotationToolbar.ts`
+- [x] T013 [US3] Connect `exportToGif` in `src/components/SelectionOverlay.ts` with tests in `src/components/SelectionOverlay.test.ts`
 
 **Checkpoint**: Complete end-to-end user experience for animated GIF creation.
 
@@ -87,6 +87,6 @@ description: "Task list for feature 008-gif-recording-and-optimization"
 
 **Purpose**: Documentation, quickstart validation, and quality gates
 
-- [ ] T014 [P] Update `README.md` with GIF export instructions and full roadmap completion notice
-- [ ] T015 Execute quickstart verification (`specs/008-gif-recording-and-optimization/quickstart.md`)
-- [ ] T016 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)
+- [x] T014 [P] Update `README.md` with GIF export instructions and full roadmap completion notice
+- [x] T015 Execute quickstart verification (`specs/008-gif-recording-and-optimization/quickstart.md`)
+- [x] T016 Run formatting, Clippy, and test suites (`cargo fmt -- --check && cargo clippy -- -D warnings && npm test`)

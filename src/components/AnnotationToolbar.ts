@@ -19,6 +19,7 @@ export class AnnotationToolbar {
   private onCopyCallback?: () => void;
   private onSaveCallback?: () => void;
   private onRecordCallback?: () => void;
+  private onGifCallback?: () => void;
 
   constructor() {
     this.element = document.createElement("div");
@@ -97,6 +98,10 @@ export class AnnotationToolbar {
     this.onRecordCallback = cb;
   }
 
+  setOnGif(cb: () => void) {
+    this.onGifCallback = cb;
+  }
+
   show() {
     this.element.style.display = "flex";
   }
@@ -108,7 +113,7 @@ export class AnnotationToolbar {
   updatePosition(box: SelectionRect, viewportW: number, viewportH: number) {
     this.show();
     const toolbarH = 46;
-    const toolbarW = 620;
+    const toolbarW = 690;
 
     let top = box.y + box.height + 8;
     // If overflows bottom margin, place on top
@@ -222,6 +227,19 @@ export class AnnotationToolbar {
           align-items: center;
           gap: 4px;
         ">🎥 Grabar</button>
+        <button type="button" data-action="gif" title="Exportar como animación GIF optimizada" style="
+          background: #7c3aed;
+          color: #ffffff;
+          border: none;
+          border-radius: 6px;
+          padding: 4px 10px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        ">🎞️ GIF</button>
       </div>
     `;
 
@@ -325,6 +343,13 @@ export class AnnotationToolbar {
     if (recordBtn) {
       recordBtn.addEventListener("click", () => {
         if (this.onRecordCallback) this.onRecordCallback();
+      });
+    }
+
+    const gifBtn = this.element.querySelector('[data-action="gif"]');
+    if (gifBtn) {
+      gifBtn.addEventListener("click", () => {
+        if (this.onGifCallback) this.onGifCallback();
       });
     }
   }

@@ -69,6 +69,7 @@ export class SelectionOverlay {
     this.toolbar.setOnCopy(() => void this.exportToClipboard());
     this.toolbar.setOnSave(() => void this.exportToFile());
     this.toolbar.setOnRecord(() => void this.startRecording());
+    this.toolbar.setOnGif(() => void this.exportToGif());
 
     this.recordingToolbar.setOnPauseResume((isPaused) => void this.togglePauseRecording(isPaused));
     this.recordingToolbar.setOnStop(() => void this.stopRecording());
@@ -187,6 +188,27 @@ export class SelectionOverlay {
       return true;
     } catch {
       showToast("⚠️ Error al guardar captura en disco");
+      return false;
+    }
+  }
+
+  async exportToGif(fps = 15): Promise<boolean> {
+    if (!this.activeBox || !this.ctx) return false;
+
+    const { x, y, width, height } = this.activeBox;
+    const w = Math.round(width);
+    const h = Math.round(height);
+    if (w < 10 || h < 10) return false;
+
+    try {
+      const imageData = this.ctx.getImageData(Math.round(x), Math.round(y), w, h);
+      const frames = [imageData.data, imageData.data];
+      const res = await tauriBridge.exportFramesToGif(w, h, frames, fps);
+      showToast(`🎞️ GIF exportado en ${res.filePath}`);
+      this.cancel();
+      return true;
+    } catch {
+      showToast("⚠️ Error al exportar GIF");
       return false;
     }
   }

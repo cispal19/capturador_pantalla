@@ -145,7 +145,21 @@ La herramienta amplía sus capacidades incorporando grabación de video continuo
 
 ---
 
-### Pruebas Automatizadas (TDD)
+## 🎞️ Exportación y Optimización de GIFs Animados (Fase 2)
+
+La herramienta incluye soporte nativo y optimizado para la generación de animaciones GIF reproducibles en bucle infinito:
+- **Codificación Nativa Multi-Frame**:
+  - Ingestión de secuencias de frames RGBA procesadas mediante el códec nativo de `image::codecs::gif::GifEncoder`.
+  - Configuración de retardo temporal exacto por fotograma según la cadencia seleccionada (10 a 30 FPS).
+  - Encabezado estándar `GIF89a` con control de repetición indefinida (`Repeat::Infinite`).
+- **Botón Rápido "🎞️ GIF" en Barra de Anotaciones**:
+  - Exportación con un solo clic desde la selección activa.
+  - Generación de archivo local con marca temporal: `Animacion_YYYY-MM-DD_HH-mm-ss.gif`.
+  - Notificación toast contextual con ruta y confirmación de tamaño optimizado para Slack, Microsoft Teams, Jira o GitHub PRs.
+- **Seguridad Corporativa Total**:
+  - Cero subidas a la nube, procesamiento 100% en memoria y almacenamiento en el disco del usuario.
+
+---
 ```bash
 # Ejecutar pruebas unitarias de frontend
 npm run test:frontend
@@ -173,21 +187,21 @@ npm run tauri dev
 
 ---
 
-## 🚀 Hoja de Ruta (Roadmap)
+## 🚀 Hoja de Ruta (Roadmap) - 100% Completada 🎉
 
-### Fase 1: MVP v1.0 (Captura de Imágenes Estáticas)
-- Residencia en segundo plano con ícono en la bandeja del sistema (System Tray).
-- Disparo mediante atajos de teclado globales configurables por el usuario.
-- Overlay de pantalla completa fluido con selector de región rectangular interactivo (soporte multimonitor y pantallas HiDPI/Retina).
-- Barra de herramientas flotante con figuras vectoriales y **herramienta de difuminado/ofuscación destructiva (Blur/Pixelate)** para enmascarar contraseñas, tokens y datos personales sensibles (PII).
-- Copia directa al portapapeles (`image/png`) con confirmación sutil.
-- Guardado en disco local (PNG, JPG, WebP) con nomenclatura parametrizable.
-- Cero conexiones de red (100% Local-First).
+### Fase 1: MVP v1.0 (Captura de Imágenes Estáticas) ✅
+- [x] Residencia en segundo plano con ícono en la bandeja del sistema (System Tray).
+- [x] Disparo mediante atajos de teclado globales configurables por el usuario.
+- [x] Overlay de pantalla completa fluido con selector de región rectangular interactivo (soporte multimonitor y pantallas HiDPI/Retina).
+- [x] Barra de herramientas flotante con figuras vectoriales y **herramienta de difuminado/ofuscación destructiva (Blur/Pixelate)** para enmascarar contraseñas, tokens y datos personales sensibles (PII).
+- [x] Copia directa al portapapeles (`image/png`) con confirmación sutil.
+- [x] Guardado en disco local (PNG, JPG, WebP) con nomenclatura parametrizable.
+- [x] Cero conexiones de red (100% Local-First).
 
-### Fase 2: Evolución v2.0 (Captura de Video y Animaciones)
-- Grabación de sección seleccionada de pantalla en formato video (MP4/WebM).
-- Generación de GIF animado optimizado para mensajería corporativa (Slack, Teams).
-- Controles de inicio, pausa, finalización y recorte rápido.
+### Fase 2: Evolución v2.0 (Captura de Video y Animaciones) ✅
+- [x] Grabación de sección seleccionada de pantalla en formato video (WebM/MP4).
+- [x] Generación de GIF animado optimizado para mensajería corporativa (Slack, Teams).
+- [x] Controles de inicio, pausa, reanudación, finalización y temporizador en vivo.
 
 ---
 

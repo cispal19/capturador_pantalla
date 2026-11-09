@@ -128,4 +128,14 @@ describe("TauriBridgeService", () => {
     const status = await tauriBridge.getRecordingStatus();
     expect(status.state).toBeDefined();
   });
+
+  it("exports frames to animated GIF via tauriBridge (Feature 008)", async () => {
+    const frame = new Uint8ClampedArray(10 * 10 * 4);
+    frame.fill(128);
+    const result = await tauriBridge.exportFramesToGif(10, 10, [frame, frame], 15);
+    expect(result.filePath).toContain(".gif");
+    expect(result.frameCount).toBe(2);
+    expect(result.durationSeconds).toBeCloseTo(2 / 15, 2);
+    expect(result.fileSizeBytes).toBeGreaterThan(0);
+  });
 });

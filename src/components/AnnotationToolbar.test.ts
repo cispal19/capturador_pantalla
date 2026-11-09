@@ -70,4 +70,16 @@ describe("AnnotationToolbar Component", () => {
     toolbar.updatePosition({ x: 500, y: 800, width: 400, height: 260 }, 1920, 1080);
     expect(parseInt(style.top, 10)).toBeLessThan(800);
   });
+
+  it("renders GIF export button and triggers onGif callback on click", () => {
+    const onGifMock = vi.fn();
+    toolbar.setOnGif(onGifMock);
+
+    const gifBtn = toolbar.getElement().querySelector('[data-action="gif"]') as HTMLButtonElement;
+    expect(gifBtn).not.toBeNull();
+    expect(gifBtn.textContent).toContain("GIF");
+
+    gifBtn.click();
+    expect(onGifMock).toHaveBeenCalledTimes(1);
+  });
 });

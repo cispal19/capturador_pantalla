@@ -22,6 +22,16 @@ impl FileNameGenerator {
         )
     }
 
+    /// Formats an animation filename with standard prefix and timestamp: `Animacion_YYYY-MM-DD_HH-mm-ss.{ext}`
+    pub fn generate_animation_name(ext: &str, timestamp_secs: u64) -> String {
+        let (year, month, day, hour, min, sec) = Self::timestamp_to_datetime(timestamp_secs);
+        let clean_ext = ext.trim_start_matches('.');
+        format!(
+            "Animacion_{:04}-{:02}-{:02}_{:02}-{:02}-{:02}.{}",
+            year, month, day, hour, min, sec, clean_ext
+        )
+    }
+
     /// Pure mathematical decomposition of seconds since Unix Epoch (1970-01-01 00:00:00 UTC)
     fn timestamp_to_datetime(secs: u64) -> (u32, u32, u32, u32, u32, u32) {
         let sec = (secs % 60) as u32;
@@ -101,5 +111,12 @@ pub mod tests {
         let ts = 1794225600;
         let name = FileNameGenerator::generate_recording_name("webm", ts);
         assert_eq!(name, "Grabacion_2026-11-09_12-00-00.webm");
+    }
+
+    #[test]
+    fn test_file_name_generator_animation() {
+        let ts = 1794225600;
+        let name = FileNameGenerator::generate_animation_name("gif", ts);
+        assert_eq!(name, "Animacion_2026-11-09_12-00-00.gif");
     }
 }
