@@ -47,6 +47,16 @@ export interface SelectionOverlayConfig {
   badgeTextColor: string;
   backgroundImageUrl?: string;
   preloadedImage?: HTMLImageElement | null;
+  displayId?: number;
+  displays?: Array<{
+    id: number;
+    name: string;
+    logical_width: number;
+    logical_height: number;
+    is_primary: boolean;
+  }>;
+  onSwitchDisplay?: (displayId: number) => void;
+  restoreMainOnFinish?: boolean;
 }
 
 export const DEFAULT_OVERLAY_CONFIG: SelectionOverlayConfig = {

@@ -118,6 +118,14 @@ export class TauriBridgeService {
     }
   }
 
+  async finishCapture(restoreMain = false): Promise<void> {
+    try {
+      await invoke("finish_capture_session_flow", { restoreMain });
+    } catch {
+      await this.hideCaptureOverlay();
+    }
+  }
+
   async registerCaptureShortcut(
     accelerator: string
   ): Promise<{ registered: boolean; accelerator: string }> {

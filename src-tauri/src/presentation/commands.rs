@@ -231,18 +231,56 @@ pub fn start_capture_session_flow(
     // 2. Allow 200ms for OS compositor to clear the main window from the screen
     std::thread::sleep(std::time::Duration::from_millis(200));
 
-    // 3. Capture desktop screenshot via xcap
-    let capture_res = trigger_screen_capture(display_id)?;
+    // 3. Detect which monitor the user is interacting with
+    let all_connected = get_connected_monitors().unwrap_or_default();
+    let xcap_monitors = xcap::Monitor::all().unwrap_or_default();
+    let available_tauri_mons = app.available_monitors().unwrap_or_default();
 
-    // 4. Position and show the overlay window
+    let cursor_pos = app
+        .cursor_position()
+        .unwrap_or(tauri::PhysicalPosition { x: 0.0, y: 0.0 });
+
+    let detected_idx =
+        if let Ok(mon) = xcap::Monitor::from_point(cursor_pos.x as i32, cursor_pos.y as i32) {
+            let mon_id = mon.id().unwrap_or(0);
+            xcap_monitors
+                .iter()
+                .position(|m| m.id().unwrap_or(0) == mon_id)
+                .unwrap_or(0)
+        } else {
+            0
+        };
+
+    let target_display_id = match display_id {
+        Some(id) => id.min(all_connected.len().saturating_sub(1) as u32),
+        None => detected_idx as u32,
+    };
+
+    // 4. Capture desktop screenshot of target monitor via xcap
+    let capture_res = trigger_screen_capture(Some(target_display_id))?;
+
+    // 5. Position and show the overlay window on the target monitor
     if let Some(overlay_win) = app.get_webview_window("overlay") {
-        let target_mon = overlay_win
-            .current_monitor()
-            .ok()
-            .flatten()
-            .or_else(|| overlay_win.primary_monitor().ok().flatten());
+        let target_xcap_mon = xcap_monitors.get(target_display_id as usize);
 
-        if let Some(mon) = target_mon {
+        let target_tauri_mon = if let Some(xm) = target_xcap_mon {
+            let xm_x = xm.x().unwrap_or(0);
+            let xm_y = xm.y().unwrap_or(0);
+            available_tauri_mons
+                .iter()
+                .find(|tm| tm.position().x == xm_x && tm.position().y == xm_y)
+                .cloned()
+        } else {
+            None
+        }
+        .or_else(|| {
+            app.monitor_from_point(cursor_pos.x, cursor_pos.y)
+                .ok()
+                .flatten()
+        })
+        .or_else(|| app.primary_monitor().ok().flatten());
+
+        if let Some(ref mon) = target_tauri_mon {
             let size = mon.size();
             let pos = mon.position();
             let _ = overlay_win.set_position(tauri::Position::Physical(*pos));
@@ -260,6 +298,8 @@ pub fn start_capture_session_flow(
                 "width": capture_res.width,
                 "height": capture_res.height,
                 "scaleFactor": capture_res.scale_factor,
+                "displayId": target_display_id,
+                "displays": all_connected,
             }),
         );
     }
@@ -268,12 +308,27 @@ pub fn start_capture_session_flow(
 }
 
 #[tauri::command]
-pub fn hide_capture_overlay(app: tauri::AppHandle) -> Result<(), String> {
+pub fn finish_capture_session_flow(
+    app: tauri::AppHandle,
+    restore_main: bool,
+) -> Result<(), String> {
     use tauri::Manager;
     if let Some(overlay_win) = app.get_webview_window("overlay") {
         let _ = overlay_win.hide();
     }
+    if restore_main {
+        if let Some(main_win) = app.get_webview_window("main") {
+            let _ = main_win.show();
+            let _ = main_win.unminimize();
+            let _ = main_win.set_focus();
+        }
+    }
     Ok(())
+}
+
+#[tauri::command]
+pub fn hide_capture_overlay(app: tauri::AppHandle) -> Result<(), String> {
+    finish_capture_session_flow(app, false)
 }
 
 #[tauri::command]

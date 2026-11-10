@@ -4,6 +4,21 @@ import { SelectionOverlay } from "./components/SelectionOverlay";
 import { SettingsModal } from "./components/SettingsModal";
 import { listen } from "@tauri-apps/api/event";
 
+interface StartCapturePayload {
+  imageUrl?: string;
+  width?: number;
+  height?: number;
+  scaleFactor?: number;
+  displayId?: number;
+  displays?: Array<{
+    id: number;
+    name: string;
+    logical_width: number;
+    logical_height: number;
+    is_primary: boolean;
+  }>;
+}
+
 let activeOverlay: SelectionOverlay | null = null;
 let settingsModal: SettingsModal | null = null;
 
@@ -16,7 +31,7 @@ async function initOverlay() {
   let overlayInstance: SelectionOverlay | null = null;
 
   try {
-    await listen<{ imageUrl?: string }>("start-capture", async (event) => {
+    await listen<StartCapturePayload>("start-capture", async (event) => {
       if (overlayInstance) {
         overlayInstance.destroy();
         overlayInstance = null;
@@ -35,6 +50,12 @@ async function initOverlay() {
       overlayInstance = new SelectionOverlay({
         preloadedImage: preloadedImg,
         backgroundImageUrl: event.payload?.imageUrl,
+        displayId: event.payload?.displayId,
+        displays: event.payload?.displays,
+        restoreMainOnFinish: true,
+        onSwitchDisplay: (nextDisplayId) => {
+          void tauriBridge.startCapture(nextDisplayId);
+        },
       });
       overlayInstance.mount();
 
@@ -43,13 +64,13 @@ async function initOverlay() {
           overlayInstance.destroy();
           overlayInstance = null;
         }
-        await tauriBridge.hideCaptureOverlay();
+        await tauriBridge.finishCapture(true);
       });
     });
   } catch {}
 }
 
-async function startSelection() {
+async function startSelection(fromDashboard = false) {
   // Close preferences modal if open
   if (settingsModal?.isOpen()) {
     settingsModal.close();
@@ -71,6 +92,7 @@ async function startSelection() {
   }
   activeOverlay = new SelectionOverlay({
     backgroundImageUrl: captureResult.image_data_url,
+    restoreMainOnFinish: fromDashboard,
   });
   activeOverlay.mount();
   activeOverlay.setOnCancel(() => {
@@ -92,6 +114,13 @@ async function renderApp() {
   settingsModal = new SettingsModal();
   settingsModal.mount();
 
+  const monitorsSummary =
+    monitors.length > 1
+      ? `${monitors.length} pantallas conectadas (Activa automática por cursor)`
+      : primary
+        ? `${primary.logical_width}x${primary.logical_height} (${primary.scale_factor}x)`
+        : "N/D";
+
   root.innerHTML = `
     <div class="container">
       <h1>Capturador de Pantalla</h1>
@@ -105,7 +134,7 @@ async function renderApp() {
         <button id="btn-preferences" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 0.75rem 1.25rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;">
           ⚙️ Preferencias
         </button>
-        <button id="btn-hide" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; padding: 0.75rem 1.25rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;" title="Ocultar la ventana en segundo plano (puedes restaurarla desde el ícono de la bandeja)">
+        <button id="btn-hide" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; padding: 0.75rem 1.25rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;" title="Ocultar la ventana en segundo plano (puedes restaurarla desde el ícono de la bandeja o del Dock)">
           🙈 Ocultar a la Bandeja
         </button>
       </div>
@@ -114,13 +143,13 @@ async function renderApp() {
       </p>
 
       <div id="selection-status" style="margin: 1rem 0; font-size: 0.9rem; color: #0f172a; min-height: 1.5rem;">
-        Listo para capturar.
+        Listo para capturar en cualquiera de tus pantallas.
       </div>
 
       <div class="info-grid">
         <div class="info-item"><strong>Versión:</strong> ${appInfo.version}</div>
         <div class="info-item"><strong>Sistema Operativo:</strong> ${appInfo.os}</div>
-        <div class="info-item"><strong>Monitor Principal:</strong> ${primary ? `${primary.logical_width}x${primary.logical_height} (${primary.scale_factor}x)` : "N/D"}</div>
+        <div class="info-item"><strong>Pantalla(s):</strong> ${monitorsSummary}</div>
         <div class="info-item"><strong>Privacidad:</strong> Verificada Local-First</div>
       </div>
     </div>
@@ -129,7 +158,7 @@ async function renderApp() {
   const btnCapture = document.getElementById("btn-capture");
   if (btnCapture) {
     btnCapture.addEventListener("click", () => {
-      void startSelection();
+      void startSelection(true);
     });
   }
 
@@ -150,6 +179,13 @@ async function renderApp() {
     });
   }
 
+  window.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === "x" || e.key === "X")) {
+      e.preventDefault();
+      void startSelection(true);
+    }
+  });
+
   try {
     const { getCurrentWindow } = await import("@tauri-apps/api/window");
     const win = getCurrentWindow();
@@ -161,12 +197,13 @@ async function renderApp() {
     void listen("open-preferences", async () => {
       try {
         await win.show();
+        await win.unminimize();
         await win.setFocus();
       } catch {}
       void settingsModal?.open();
     });
     void listen("trigger-capture", async () => {
-      void startSelection();
+      void startSelection(false);
     });
   } catch {
     // Ignore in non-Tauri headless environments

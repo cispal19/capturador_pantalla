@@ -38,6 +38,7 @@ export class SelectionOverlay {
   private drawStartY = 0;
   private isDrawingAnnotation = false;
   private bgImage: HTMLImageElement | null = null;
+  private displaySwitcherEl: HTMLElement | null = null;
 
   private onCancelCallback?: () => void;
   private onSelectionCompleteCallback?: (box: SelectionRect) => void;
@@ -95,6 +96,9 @@ export class SelectionOverlay {
     this.container.appendChild(this.canvas);
     this.toolbar.mount(container);
     this.recordingToolbar.mount(container);
+    if (this.config.displays && this.config.displays.length > 1) {
+      this.mountDisplaySwitcher(container);
+    }
     this.ctx = this.canvas.getContext("2d");
 
     this.updateCanvasDimensions();
@@ -109,6 +113,62 @@ export class SelectionOverlay {
     this.requestRender();
   }
 
+  private mountDisplaySwitcher(container: HTMLElement) {
+    if (!this.config.displays || this.config.displays.length <= 1) return;
+
+    this.displaySwitcherEl = document.createElement("div");
+    this.displaySwitcherEl.className = "display-switcher-pill";
+    this.displaySwitcherEl.style.position = "fixed";
+    this.displaySwitcherEl.style.top = "16px";
+    this.displaySwitcherEl.style.left = "50%";
+    this.displaySwitcherEl.style.transform = "translateX(-50%)";
+    this.displaySwitcherEl.style.zIndex = "1000000";
+    this.displaySwitcherEl.style.display = "flex";
+    this.displaySwitcherEl.style.gap = "8px";
+    this.displaySwitcherEl.style.background = "rgba(15, 23, 42, 0.9)";
+    this.displaySwitcherEl.style.backdropFilter = "blur(8px)";
+    this.displaySwitcherEl.style.padding = "6px 14px";
+    this.displaySwitcherEl.style.borderRadius = "9999px";
+    this.displaySwitcherEl.style.border = "1px solid rgba(255, 255, 255, 0.15)";
+    this.displaySwitcherEl.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.4)";
+    this.displaySwitcherEl.style.fontFamily = "system-ui, -apple-system, sans-serif";
+
+    for (let i = 0; i < this.config.displays.length; i++) {
+      const d = this.config.displays[i];
+      const isCurrent = (this.config.displayId ?? 0) === d.id;
+      const btn = document.createElement("button");
+      btn.style.background = isCurrent ? "#2563eb" : "rgba(255, 255, 255, 0.1)";
+      btn.style.color = isCurrent ? "#ffffff" : "#cbd5e1";
+      btn.style.border = isCurrent ? "1px solid #3b82f6" : "1px solid rgba(255, 255, 255, 0.1)";
+      btn.style.borderRadius = "6px";
+      btn.style.padding = "4px 10px";
+      btn.style.fontSize = "12px";
+      btn.style.fontWeight = isCurrent ? "600" : "400";
+      btn.style.cursor = "pointer";
+      btn.style.transition = "all 0.2s";
+      btn.innerText = `🖥️ Pantalla ${i + 1}${d.is_primary ? " (Principal)" : ""}`;
+      btn.title = `Cambiar a Pantalla ${i + 1} (${d.logical_width}x${d.logical_height})`;
+
+      btn.addEventListener("click", () => {
+        if (!isCurrent) {
+          this.config.onSwitchDisplay?.(d.id);
+        }
+      });
+
+      this.displaySwitcherEl.appendChild(btn);
+    }
+
+    const tip = document.createElement("span");
+    tip.style.color = "#94a3b8";
+    tip.style.fontSize = "11px";
+    tip.style.alignSelf = "center";
+    tip.style.marginLeft = "4px";
+    tip.innerText = "(Tab para alternar)";
+    this.displaySwitcherEl.appendChild(tip);
+
+    container.appendChild(this.displaySwitcherEl);
+  }
+
   destroy() {
     if (this.animationFrameId !== null) {
       cancelAnimationFrame(this.animationFrameId);
@@ -117,6 +177,11 @@ export class SelectionOverlay {
 
     this.toolbar.destroy();
     this.recordingToolbar.destroy();
+
+    if (this.displaySwitcherEl && this.displaySwitcherEl.parentNode) {
+      this.displaySwitcherEl.parentNode.removeChild(this.displaySwitcherEl);
+      this.displaySwitcherEl = null;
+    }
 
     this.canvas.removeEventListener("mousedown", this.handleMouseDown);
     this.canvas.removeEventListener("mousemove", this.handleMouseMove);
@@ -654,13 +719,24 @@ export class SelectionOverlay {
 
   private async hideWindowIfDesktop() {
     try {
-      await tauriBridge.hideCaptureOverlay();
+      await tauriBridge.finishCapture(this.config.restoreMainOnFinish ?? false);
       const { getCurrentWindow } = await import("@tauri-apps/api/window");
       await getCurrentWindow().hide();
     } catch {}
   }
 
   private handleKeyDown(e: KeyboardEvent) {
+    if (e.key === "Tab" && this.config.displays && this.config.displays.length > 1) {
+      e.preventDefault();
+      const currentIndex = this.config.displays.findIndex(
+        (d) => d.id === (this.config.displayId ?? 0)
+      );
+      const nextIndex = (currentIndex + 1) % this.config.displays.length;
+      const nextDisplay = this.config.displays[nextIndex];
+      this.config.onSwitchDisplay?.(nextDisplay.id);
+      return;
+    }
+
     if (e.key === "Escape") {
       this.cancel();
       void this.hideWindowIfDesktop();
