@@ -18,55 +18,75 @@ body.overlay-mode {
   background-color: #f7f9fc;
 }
 
+html {
+  height: 100%;
+  overflow: hidden !important;
+}
+
 body {
   margin: 0;
+  padding: 0;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden !important;
+  box-sizing: border-box;
+  background-color: #f8fafc;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .container {
-  max-width: 600px;
+  max-width: 580px;
+  width: 90%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.25rem 1.75rem;
   text-align: center;
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
 h1 {
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.6rem;
+  margin: 0 0 0.35rem 0;
   color: #0f172a;
 }
 
 .badge-local-first {
   display: inline-block;
-  padding: 0.35rem 0.8rem;
-  font-size: 0.85rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #065f46;
   background-color: #d1fae5;
   border-radius: 9999px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 0.75rem;
   text-align: left;
-  margin-top: 1.5rem;
-  padding: 1rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
   background: #f8fafc;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
 }
 
 .info-item {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .info-item strong {

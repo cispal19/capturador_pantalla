@@ -25,9 +25,25 @@ pub fn create_tray(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
 
     let menu = Menu::with_items(app, &[&capture_i, &toggle_i, &preferences_i, &quit_i])?;
 
-    TrayIconBuilder::new()
+    let icon_bytes = include_bytes!("../../icons/32x32.png");
+    let icon = if let Ok(img) = image::load_from_memory(icon_bytes) {
+        let rgba = img.to_rgba8();
+        let (width, height) = rgba.dimensions();
+        Some(tauri::image::Image::new_owned(rgba.into_raw(), width, height))
+    } else {
+        app.default_window_icon().cloned()
+    };
+
+    let mut builder = TrayIconBuilder::with_id("main-tray")
         .menu(&menu)
         .show_menu_on_left_click(true)
+        .tooltip("Capturador de Pantalla");
+
+    if let Some(tray_icon) = icon {
+        builder = builder.icon(tray_icon).icon_as_template(true);
+    }
+
+    builder
         .on_menu_event(|app, event| match event.id.as_ref() {
             "capture" => {
                 let app_handle = app.clone();

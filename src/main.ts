@@ -125,32 +125,33 @@ async function renderApp() {
     <div class="container">
       <h1>Capturador de Pantalla</h1>
       <span class="badge-local-first">🛡️ 100% Local-First / Zero Network</span>
-      <p>Herramienta corporativa de captura de pantalla y anotaciones de alta fidelidad.</p>
+      <p style="margin: 0.25rem 0 0.75rem; font-size: 0.92rem; color: #475569;">
+        Herramienta corporativa de captura de pantalla y anotaciones de alta fidelidad.
+      </p>
       
-      <div style="margin: 1.5rem 0; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-        <button id="btn-capture" style="background: #2563eb; color: #ffffff; border: none; padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;">
+      <div style="margin: 0.75rem 0; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button id="btn-capture" style="background: #2563eb; color: #ffffff; border: none; padding: 0.65rem 1.35rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;">
           📸 Iniciar Captura de Pantalla
         </button>
-        <button id="btn-preferences" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 0.75rem 1.25rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;">
+        <button id="btn-preferences" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 0.65rem 1.15rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;">
           ⚙️ Preferencias
         </button>
-        <button id="btn-hide" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; padding: 0.75rem 1.25rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;" title="Ocultar la ventana en segundo plano (puedes restaurarla desde el ícono de la bandeja o del Dock)">
+        <button id="btn-hide" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; padding: 0.65rem 1.15rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s;" title="Ocultar la ventana en segundo plano (puedes restaurarla desde el ícono de la bandeja o del Dock)">
           🙈 Ocultar a la Bandeja
         </button>
       </div>
-      <p style="font-size: 0.85rem; color: #64748b; margin-top: -0.5rem; margin-bottom: 1rem;">
+      <p style="font-size: 0.82rem; color: #64748b; margin-top: -0.25rem; margin-bottom: 0.6rem;">
         O presiona el atajo global: <kbd style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">Command/Ctrl + Shift + X</kbd> (Cancela con <kbd style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">Esc</kbd>)
       </p>
 
-      <div id="selection-status" style="margin: 1rem 0; font-size: 0.9rem; color: #0f172a; min-height: 1.5rem;">
+      <div id="selection-status" style="margin: 0.5rem 0; font-size: 0.88rem; color: #0f172a; min-height: 1.25rem;">
         Listo para capturar en cualquiera de tus pantallas.
       </div>
 
       <div class="info-grid">
         <div class="info-item"><strong>Versión:</strong> ${appInfo.version}</div>
         <div class="info-item"><strong>Sistema Operativo:</strong> ${appInfo.os}</div>
-        <div class="info-item"><strong>Pantalla(s):</strong> ${monitorsSummary}</div>
-        <div class="info-item"><strong>Privacidad:</strong> Verificada Local-First</div>
+        <div class="info-item" style="grid-column: span 2;"><strong>Pantalla(s):</strong> ${monitorsSummary}</div>
       </div>
     </div>
   `;
