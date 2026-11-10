@@ -21,6 +21,7 @@ coverage/
 target/
 src-tauri/target/
 src-tauri/gen/
+release/
 *.rs.bk
 *.rlib
 Cargo.lock.bak
