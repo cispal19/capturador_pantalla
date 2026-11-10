@@ -123,10 +123,13 @@ async function renderApp() {
 
   root.innerHTML = `
     <div class="container">
-      <h1>Capturador de Pantalla</h1>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 0.35rem;">
+        <img src="/logo.png" alt="ianShort Logo" style="width: 42px; height: 42px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+        <h1 style="margin: 0; font-size: 1.7rem;">ianShort</h1>
+      </div>
       <span class="badge-local-first">🛡️ 100% Local-First / Zero Network</span>
       <p style="margin: 0.25rem 0 0.75rem; font-size: 0.92rem; color: #475569;">
-        Herramienta corporativa de captura de pantalla y anotaciones de alta fidelidad.
+        Captura de pantalla corporativa, anotaciones de alta fidelidad y grabación.
       </p>
       
       <div style="margin: 0.75rem 0; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">

@@ -92,7 +92,7 @@ pub fn get_app_info() -> AppInfoResponse {
     };
 
     AppInfoResponse {
-        name: "capturador-pantalla".to_string(),
+        name: "ianshort".to_string(),
         version: "1.0.0".to_string(),
         environment: if cfg!(debug_assertions) {
             "development".to_string()

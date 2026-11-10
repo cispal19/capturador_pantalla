@@ -4,7 +4,7 @@ import { tauriBridge } from "./tauriBridge";
 describe("TauriBridgeService", () => {
   it("retrieves app info with local-first verified flag", async () => {
     const info = await tauriBridge.getAppInfo();
-    expect(info.name).toBe("capturador-pantalla");
+    expect(info.name).toBe("ianshort");
     expect(info.version).toBe("1.0.0");
     expect(info.local_first_verified).toBe(true);
   });

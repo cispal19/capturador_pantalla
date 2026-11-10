@@ -1,6 +1,10 @@
-# Capturador de Pantalla Corporativo Open Source 📸
+# ianShort 📸
 
-Una herramienta de escritorio multiplataforma (macOS, Windows y Linux), de código abierto, ultraligera y segura por diseño (Local-First), diseñada para capturar, anotar, ofuscar información sensible y compartir secciones de pantalla al instante sin costos de licenciamiento ni riesgos de fuga de datos en entornos empresariales.
+<p align="center">
+  <img src="public/logo.png" alt="ianShort Logo" width="128" height="128" style="border-radius: 28px;" />
+</p>
+
+**ianShort** es una herramienta de escritorio nativa para macOS, Windows y Linux, de código abierto, ultraligera y segura por diseño (**100% Local-First**), diseñada para capturar, anotar, ofuscar información sensible y compartir secciones de pantalla o animaciones GIF al instante sin costos de licenciamiento ni riesgos de fuga de datos en entornos empresariales.
 
 ---
 

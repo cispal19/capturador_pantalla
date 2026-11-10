@@ -17,7 +17,7 @@ export class TauriBridgeService {
       return await invoke<AppInfo>("get_app_info");
     } catch {
       return {
-        name: "capturador-pantalla",
+        name: "ianshort",
         version: "1.0.0",
         environment: "development",
         os: "macos",

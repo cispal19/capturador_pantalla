@@ -25,7 +25,7 @@ pub fn create_tray(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
 
     let menu = Menu::with_items(app, &[&capture_i, &toggle_i, &preferences_i, &quit_i])?;
 
-    let icon_bytes = include_bytes!("../../icons/32x32.png");
+    let icon_bytes = include_bytes!("../../icons/tray.png");
     let icon = if let Ok(img) = image::load_from_memory(icon_bytes) {
         let rgba = img.to_rgba8();
         let (width, height) = rgba.dimensions();
@@ -37,7 +37,7 @@ pub fn create_tray(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
     let mut builder = TrayIconBuilder::with_id("main-tray")
         .menu(&menu)
         .show_menu_on_left_click(true)
-        .tooltip("Capturador de Pantalla");
+        .tooltip("ianShort");
 
     if let Some(tray_icon) = icon {
         builder = builder.icon(tray_icon).icon_as_template(true);

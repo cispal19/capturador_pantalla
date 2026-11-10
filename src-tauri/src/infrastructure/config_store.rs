@@ -30,9 +30,13 @@ impl JsonConfigStoreDriver {
         #[cfg(target_os = "windows")]
         {
             if let Ok(app_data) = env::var("APPDATA") {
-                return Path::new(&app_data)
-                    .join("capturador-pantalla")
-                    .join("config.json");
+                let base = Path::new(&app_data);
+                let new_path = base.join("ianshort").join("config.json");
+                let legacy_path = base.join("capturador-pantalla").join("config.json");
+                if !new_path.exists() && legacy_path.exists() {
+                    return legacy_path;
+                }
+                return new_path;
             }
         }
 
@@ -40,24 +44,31 @@ impl JsonConfigStoreDriver {
         {
             if let Ok(xdg) = env::var("XDG_CONFIG_HOME") {
                 if !xdg.trim().is_empty() {
-                    return Path::new(&xdg)
-                        .join("capturador-pantalla")
-                        .join("config.json");
+                    let base = Path::new(&xdg);
+                    let new_path = base.join("ianshort").join("config.json");
+                    let legacy_path = base.join("capturador-pantalla").join("config.json");
+                    if !new_path.exists() && legacy_path.exists() {
+                        return legacy_path;
+                    }
+                    return new_path;
                 }
             }
 
             if let Ok(home) = env::var("HOME") {
                 if !home.trim().is_empty() {
-                    return Path::new(&home)
-                        .join(".config")
-                        .join("capturador-pantalla")
-                        .join("config.json");
+                    let base = Path::new(&home).join(".config");
+                    let new_path = base.join("ianshort").join("config.json");
+                    let legacy_path = base.join("capturador-pantalla").join("config.json");
+                    if !new_path.exists() && legacy_path.exists() {
+                        return legacy_path;
+                    }
+                    return new_path;
                 }
             }
         }
 
         env::temp_dir()
-            .join("capturador-pantalla")
+            .join("ianshort")
             .join("config.json")
     }
 

@@ -105,7 +105,7 @@ mod tests {
     #[test]
     fn test_app_lifecycle_metadata() {
         let info = get_app_info();
-        assert_eq!(info.name, "capturador-pantalla");
+        assert_eq!(info.name, "ianshort");
         assert_eq!(info.version, "1.0.0");
         assert!(info.local_first_verified);
     }
@@ -124,5 +124,10 @@ mod tests {
 
         let sc_ctrl = "Ctrl+Shift+X".parse::<Shortcut>();
         assert!(sc_ctrl.is_ok(), "Ctrl+Shift+X should parse");
+    }
+
+    #[test]
+    fn test_tray_icon_exists() {
+        assert!(std::path::Path::new("icons/tray.png").exists());
     }
 }
